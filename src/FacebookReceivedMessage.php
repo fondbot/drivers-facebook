@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace FondBot\Drivers\Facebook;
 
-use FondBot\Drivers\ReceivedMessage;
-use FondBot\Drivers\ReceivedMessage\Attachment;
-use FondBot\Drivers\ReceivedMessage\Location;
 use GuzzleHttp\Client;
+use FondBot\Drivers\ReceivedMessage;
+use FondBot\Drivers\ReceivedMessage\Location;
+use FondBot\Drivers\ReceivedMessage\Attachment;
 
 class FacebookReceivedMessage implements ReceivedMessage
 {

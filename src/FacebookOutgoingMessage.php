@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace FondBot\Drivers\Facebook;
 
+use FondBot\Drivers\User;
 use FondBot\Conversation\Keyboard;
 use FondBot\Drivers\OutgoingMessage;
-use FondBot\Drivers\User;
 
 class FacebookOutgoingMessage implements OutgoingMessage
 {
