@@ -4,19 +4,18 @@ declare(strict_types=1);
 
 namespace Tests\Unit;
 
+use FondBot\Drivers\ReceivedMessage\Attachment;
+use FondBot\Drivers\ReceivedMessage\Location;
+use FondBot\Drivers\User;
 use Tests\TestCase;
 use GuzzleHttp\Client;
 use FondBot\Helpers\Str;
 use FondBot\Conversation\Keyboard;
-use FondBot\Contracts\Drivers\User;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
-use FondBot\Drivers\Facebook\FacebookUser;
 use GuzzleHttp\Exception\RequestException;
 use FondBot\Drivers\Facebook\FacebookDriver;
 use FondBot\Conversation\Buttons\ReplyButton;
-use FondBot\Contracts\Drivers\Message\Location;
-use FondBot\Contracts\Drivers\Message\Attachment;
 use FondBot\Drivers\Facebook\FacebookOutgoingMessage;
 use FondBot\Drivers\Facebook\FacebookReceivedMessage;
 
@@ -52,7 +51,7 @@ class FacebookDriverTest extends TestCase
     }
 
     /**
-     * @expectedException \FondBot\Contracts\Drivers\InvalidRequest
+     * @expectedException \FondBot\Drivers\Exceptions\InvalidRequest
      * @expectedExceptionMessage Header signature is not provided
      */
     public function test_verifyRequest_invalid_header()
@@ -70,7 +69,7 @@ class FacebookDriverTest extends TestCase
     }
 
     /**
-     * @expectedException \FondBot\Contracts\Drivers\InvalidRequest
+     * @expectedException \FondBot\Drivers\Exceptions\InvalidRequest
      * @expectedExceptionMessage Invalid signature header
      */
     public function test_verifyRequest_invalid_secret()
@@ -93,7 +92,7 @@ class FacebookDriverTest extends TestCase
     }
 
     /**
-     * @expectedException \FondBot\Contracts\Drivers\InvalidRequest
+     * @expectedException \FondBot\Drivers\Exceptions\InvalidRequest
      * @expectedExceptionMessage Invalid payload
      */
     public function test_verifyRequest_empty_message()
@@ -108,7 +107,7 @@ class FacebookDriverTest extends TestCase
     }
 
     /**
-     * @expectedException \FondBot\Contracts\Drivers\InvalidRequest
+     * @expectedException \FondBot\Drivers\Exceptions\InvalidRequest
      * @expectedExceptionMessage Invalid payload
      */
     public function test_verifyRequest_empty_message_from()
@@ -171,7 +170,6 @@ class FacebookDriverTest extends TestCase
         $sender = $this->facebook->getUser();
 
         $this->assertInstanceOf(User::class, $sender);
-        $this->assertInstanceOf(FacebookUser::class, $sender);
         $this->assertSame($senderId, $sender->getId());
         $this->assertSame($response['first_name'].' '.$response['last_name'], $sender->getName());
         $this->assertNull($sender->getUsername());
@@ -180,7 +178,7 @@ class FacebookDriverTest extends TestCase
     }
 
     /**
-     * @expectedException \FondBot\Contracts\Drivers\InvalidRequest
+     * @expectedException \FondBot\Drivers\Exceptions\InvalidRequest
      * @expectedExceptionMessage Can not get user profile
      */
     public function test_getSender_exception()
@@ -313,7 +311,7 @@ class FacebookDriverTest extends TestCase
     }
 
     /**
-     * @expectedException \FondBot\Contracts\Drivers\InvalidRequest
+     * @expectedException \FondBot\Drivers\Exceptions\InvalidRequest
      * @expectedExceptionMessage Invalid verify token
      */
     public function test_verifyWebhook_invalid_token()

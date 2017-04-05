@@ -4,15 +4,16 @@ declare(strict_types=1);
 
 namespace FondBot\Drivers\Facebook;
 
+use FondBot\Conversation\Keyboard;
+use FondBot\Drivers\Exceptions\InvalidRequest;
+use FondBot\Drivers\Extensions\WebhookVerification;
+use FondBot\Drivers\OutgoingMessage;
+use FondBot\Drivers\ReceivedMessage;
+use FondBot\Drivers\ReceivedMessage\Attachment;
+use FondBot\Drivers\User;
 use GuzzleHttp\Client;
 use FondBot\Drivers\Driver;
-use FondBot\Contracts\Drivers\User;
 use GuzzleHttp\Exception\RequestException;
-use FondBot\Contracts\Conversation\Keyboard;
-use FondBot\Contracts\Drivers\InvalidRequest;
-use FondBot\Contracts\Drivers\OutgoingMessage;
-use FondBot\Contracts\Drivers\ReceivedMessage;
-use FondBot\Contracts\Drivers\Extensions\WebhookVerification;
 
 class FacebookDriver extends Driver implements WebhookVerification
 {
@@ -70,12 +71,14 @@ class FacebookDriver extends Driver implements WebhookVerification
         $id = $this->getRequest('entry.0.messaging.0.sender.id');
 
         try {
-            $response = $this->guzzle->get(self::API_URL.$id, $this->getDefaultRequestParameters());
-            $user = json_decode((string) $response->getBody(), true);
+            $response = $this->guzzle->get(self::API_URL . $id, $this->getDefaultRequestParameters());
+            $user = json_decode((string)$response->getBody(), true);
+            $user['id'] = (string)$id;
 
-            $user['id'] = $id;
-
-            return $this->sender = new FacebookUser($user);
+            return $this->sender = new User(
+                $user['id'],
+                $user['first_name'] . ' ' . $user['last_name']
+            );
         } catch (RequestException $exception) {
             throw new InvalidRequest('Can not get user profile', 0, $exception);
         }
@@ -105,11 +108,22 @@ class FacebookDriver extends Driver implements WebhookVerification
         $message = new FacebookOutgoingMessage($sender, $text, $keyboard);
 
         $this->guzzle->post(
-            self::API_URL.'me/messages',
+            self::API_URL . 'me/messages',
             $this->getDefaultRequestParameters() + ['form_params' => $message->toArray()]
         );
 
         return $message;
+    }
+
+    /**
+     * Send attachment to recipient.
+     *
+     * @param User $recipient
+     * @param Attachment $attachment
+     */
+    public function sendAttachment(User $recipient, Attachment $attachment): void
+    {
+        // TODO: Implement sendAttachment() method.
     }
 
     /**
@@ -156,7 +170,7 @@ class FacebookDriver extends Driver implements WebhookVerification
             throw new InvalidRequest('Header signature is not provided');
         }
 
-        if (!hash_equals($header, 'sha1='.hash_hmac('sha1', json_encode($this->getRequest()), $secret))) {
+        if (!hash_equals($header, 'sha1=' . hash_hmac('sha1', json_encode($this->getRequest()), $secret))) {
             throw new InvalidRequest('Invalid signature header');
         }
     }
