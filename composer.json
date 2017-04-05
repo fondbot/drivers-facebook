@@ -1,5 +1,5 @@
 {
-  "name": "fondbot/facebook-driver",
+  "name": "fondbot/facebook",
   "description": "Facebook Messenger driver for FondBot",
   "type": "library",
   "license": "MIT",
