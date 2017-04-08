@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace FondBot\Drivers\Facebook;
 
-use FondBot\Drivers\ReceivedMessage\Attachment;
 use FondBot\Drivers\User;
+use FondBot\Drivers\ReceivedMessage\Attachment;
 
 class FacebookOutgoingAttachment
 {
@@ -33,7 +33,7 @@ class FacebookOutgoingAttachment
                     'attachment' => [
                         'type' => $this->attachment->getType(),
                         'payload' => [],
-                    ]
+                    ],
                 ]),
             ],
             [

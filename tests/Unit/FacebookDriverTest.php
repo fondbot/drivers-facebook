@@ -8,15 +8,12 @@ use Tests\TestCase;
 use GuzzleHttp\Client;
 use FondBot\Helpers\Str;
 use FondBot\Drivers\User;
-use FondBot\Conversation\Keyboard;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use GuzzleHttp\Exception\RequestException;
 use FondBot\Drivers\Facebook\FacebookDriver;
-use FondBot\Conversation\Buttons\ReplyButton;
 use FondBot\Drivers\ReceivedMessage\Location;
 use FondBot\Drivers\ReceivedMessage\Attachment;
-use FondBot\Drivers\Facebook\FacebookOutgoingMessage;
 use FondBot\Drivers\Facebook\FacebookReceivedMessage;
 
 /**
@@ -31,7 +28,7 @@ class FacebookDriverTest extends TestCase
         parent::setUp();
 
         $this->guzzle = $this->mock(Client::class);
-        $this->facebook = new FacebookDriver($this->guzzle);
+        $this->facebook = new FacebookDriverClassTest($this->guzzle);
         $this->facebook->fill($this->parameters = [
             'page_token' => Str::random(),
             'verify_token' => Str::random(),
@@ -249,55 +246,6 @@ class FacebookDriverTest extends TestCase
         $this->assertTrue($this->facebook->getMessage()->hasAttachment());
     }
 
-    public function test_sendMessage_with_keyboard()
-    {
-        $text = $this->faker()->text;
-
-        $recipient = $this->mock(User::class);
-        $recipient->shouldReceive('getId')->andReturn($recipientId = $this->faker()->uuid)->atLeast()->once();
-
-        $keyboard = new Keyboard([
-            new ReplyButton($this->faker()->word),
-            new ReplyButton($this->faker()->word),
-        ]);
-
-        $this->guzzle->shouldReceive('post')->with(
-            'https://graph.facebook.com/v2.6/me/messages',
-            [
-                'form_params' => [
-                    'recipient' => [
-                        'id' => $recipientId,
-                    ],
-                    'message' => [
-                        'text' => $text,
-                        'quick_replies' => [
-                            [
-                                'content_type' => 'text',
-                                'title' => $keyboard->getButtons()[0]->getLabel(),
-                                'payload' => $keyboard->getButtons()[0]->getLabel(),
-                            ],
-                            [
-                                'content_type' => 'text',
-                                'title' => $keyboard->getButtons()[1]->getLabel(),
-                                'payload' => $keyboard->getButtons()[1]->getLabel(),
-                            ],
-                        ],
-                    ],
-                ],
-                'query' => [
-                    'access_token' => $this->parameters['page_token'],
-                ],
-            ]
-        );
-
-        $result = $this->facebook->sendMessage($recipient, $text, $keyboard);
-
-        $this->assertInstanceOf(FacebookOutgoingMessage::class, $result);
-        $this->assertSame($recipient, $result->getRecipient());
-        $this->assertSame($text, $result->getText());
-        $this->assertSame($keyboard, $result->getKeyboard());
-    }
-
     public function test_verify_webhook_check()
     {
         $this->facebook->fill($this->parameters, [
@@ -407,5 +355,13 @@ class FacebookDriverTest extends TestCase
         return [
             'x-hub-signature' => [$this->generateSignature($data, $key)],
         ];
+    }
+}
+
+class FacebookDriverClassTest extends FacebookDriver
+{
+    public function __construct(Client $guzzle)
+    {
+        $this->guzzle = $guzzle;
     }
 }

@@ -4,15 +4,15 @@ declare(strict_types=1);
 
 namespace FondBot\Drivers\Facebook;
 
-use FondBot\Drivers\Command;
-use FondBot\Drivers\Commands\SendAttachment;
-use FondBot\Drivers\Commands\SendMessage;
-use FondBot\Queue\SerializesForQueue;
 use GuzzleHttp\Client;
 use FondBot\Drivers\User;
 use FondBot\Drivers\Driver;
+use FondBot\Drivers\Command;
 use FondBot\Drivers\ReceivedMessage;
+use FondBot\Queue\SerializesForQueue;
+use FondBot\Drivers\Commands\SendMessage;
 use GuzzleHttp\Exception\RequestException;
+use FondBot\Drivers\Commands\SendAttachment;
 use FondBot\Drivers\Exceptions\InvalidRequest;
 use FondBot\Drivers\Extensions\WebhookVerification;
 
@@ -69,9 +69,9 @@ class FacebookDriver extends Driver implements WebhookVerification
         $id = $this->getRequest('entry.0.messaging.0.sender.id');
 
         try {
-            $response = $this->getGuzzle()->get(self::API_URL . $id, $this->getDefaultRequestParameters());
-            $user = json_decode((string)$response->getBody(), true);
-            $user['id'] = (string)$id;
+            $response = $this->getGuzzle()->get(self::API_URL.$id, $this->getDefaultRequestParameters());
+            $user = json_decode((string) $response->getBody(), true);
+            $user['id'] = (string) $id;
 
             return $this->sender = new User(
                 $user['id'],
@@ -136,7 +136,7 @@ class FacebookDriver extends Driver implements WebhookVerification
             throw new InvalidRequest('Header signature is not provided');
         }
 
-        if (!hash_equals($header, 'sha1=' . hash_hmac('sha1', json_encode($this->getRequest()), $secret))) {
+        if (!hash_equals($header, 'sha1='.hash_hmac('sha1', json_encode($this->getRequest()), $secret))) {
             throw new InvalidRequest('Invalid signature header');
         }
     }
@@ -160,7 +160,7 @@ class FacebookDriver extends Driver implements WebhookVerification
         $message = new FacebookOutgoingMessage($command->recipient, $command->text, $command->keyboard);
 
         $this->getGuzzle()->post(
-            self::API_URL . 'me/messages',
+            self::API_URL.'me/messages',
             $this->getDefaultRequestParameters() + ['form_params' => $message->toArray()]
         );
     }
@@ -170,7 +170,7 @@ class FacebookDriver extends Driver implements WebhookVerification
         $content = new FacebookOutgoingAttachment($command->recipient, $command->attachment);
 
         $this->getGuzzle()->post(
-            self::API_URL . 'me/messages',
+            self::API_URL.'me/messages',
             $this->getDefaultRequestParameters() + ['multipart' => $content->toArray()]
         );
     }
