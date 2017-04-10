@@ -1,0 +1,15 @@
+{
+  "FondBot\\Drivers\\Driver": [
+    {
+      "value": "FondBot\\Drivers\\Facebook\\FacebookDriver",
+      "metadata": {
+        "name": "facebook",
+        "parameters": [
+          "page_token",
+          "verify_token",
+          "app_secret"
+        ]
+      }
+    }
+  ]
+}
