@@ -5,6 +5,7 @@
 Thumbs.db
 .idea
 .php_cs.cache
+.discovery
 
 clover.xml
 composer.lock

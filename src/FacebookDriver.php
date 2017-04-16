@@ -4,15 +4,14 @@ declare(strict_types=1);
 
 namespace FondBot\Drivers\Facebook;
 
+use FondBot\Drivers\Chat;
 use GuzzleHttp\Client;
 use FondBot\Drivers\User;
 use FondBot\Drivers\Driver;
 use FondBot\Drivers\Command;
 use FondBot\Drivers\ReceivedMessage;
 use FondBot\Queue\SerializesForQueue;
-use FondBot\Drivers\Commands\SendMessage;
 use GuzzleHttp\Exception\RequestException;
-use FondBot\Drivers\Commands\SendAttachment;
 use FondBot\Drivers\Exceptions\InvalidRequest;
 use FondBot\Drivers\Extensions\WebhookVerification;
 
@@ -26,20 +25,6 @@ class FacebookDriver extends Driver implements WebhookVerification
 
     /** @var User|null */
     protected $sender;
-
-    /**
-     * Configuration parameters.
-     *
-     * @return array
-     */
-    public function getConfig(): array
-    {
-        return [
-            'page_token',
-            'verify_token',
-            'app_secret',
-        ];
-    }
 
     /**
      * Verify incoming request data.
@@ -89,7 +74,7 @@ class FacebookDriver extends Driver implements WebhookVerification
      */
     public function getMessage(): ReceivedMessage
     {
-        return new FacebookReceivedMessage($this->getGuzzle(), $this->getRequest('entry.0.messaging.0.message'));
+        return new FacebookReceivedMessage($this->getRequest('entry.0.messaging.0.message'));
     }
 
     /**
@@ -148,35 +133,28 @@ class FacebookDriver extends Driver implements WebhookVerification
      */
     public function handle(Command $command): void
     {
-        if ($command instanceof SendMessage) {
-            $this->handleSendMessageCommand($command);
-        } elseif ($command instanceof SendAttachment) {
-            $this->handleSendAttachmentCommand($command);
-        }
-    }
-
-    protected function handleSendMessageCommand(SendMessage $command): void
-    {
-        $message = new FacebookOutgoingMessage($command->recipient, $command->text, $command->keyboard);
+        $content = ContentResolver::resolve($command);
 
         $this->getGuzzle()->post(
             self::API_URL.'me/messages',
-            $this->getDefaultRequestParameters() + ['form_params' => $message->toArray()]
-        );
-    }
-
-    protected function handleSendAttachmentCommand(SendAttachment $command): void
-    {
-        $content = new FacebookOutgoingAttachment($command->recipient, $command->attachment);
-
-        $this->getGuzzle()->post(
-            self::API_URL.'me/messages',
-            $this->getDefaultRequestParameters() + ['multipart' => $content->toArray()]
+            $this->getDefaultRequestParameters() + [$content->encodeType() => $content->toArray()]
         );
     }
 
     protected function getGuzzle()
     {
         return $this->guzzle ?: new Client();
+    }
+
+    /**
+     * Get current chat.
+     *
+     * @return Chat
+     */
+    public function getChat(): Chat
+    {
+        $id = $this->getRequest('entry.0.messaging.0.sender.id');
+
+        return new Chat($id, '');
     }
 }

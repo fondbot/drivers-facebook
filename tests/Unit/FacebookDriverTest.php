@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Unit;
 
+use FondBot\Drivers\Chat;
+use FondBot\Drivers\Commands\SendMessage;
 use Tests\TestCase;
 use GuzzleHttp\Client;
 use FondBot\Helpers\Str;
@@ -34,17 +36,6 @@ class FacebookDriverTest extends TestCase
             'verify_token' => Str::random(),
             'app_secret' => Str::random(),
         ]);
-    }
-
-    public function test_getConfig()
-    {
-        $expected = [
-            'page_token',
-            'verify_token',
-            'app_secret',
-        ];
-
-        $this->assertSame($expected, $this->facebook->getConfig());
     }
 
     /**
@@ -207,43 +198,18 @@ class FacebookDriverTest extends TestCase
         $this->assertNull($message->getLocation());
     }
 
-    public function test_getMessageWithLocation()
+    public function test_getChat()
     {
-        $latitude = $this->faker()->latitude;
-        $longitude = $this->faker()->longitude;
+        $id = $this->faker()->uuid;
 
-        $this->facebook->fill($this->parameters, $this->generateLocationResponse($latitude, $longitude));
+        $this->facebook->fill($this->parameters, $this->generateResponse($id));
 
-        $message = $this->facebook->getMessage();
-        $this->assertInstanceOf(FacebookReceivedMessage::class, $message);
-        $this->assertFalse($message->hasAttachment());
-        $this->assertInstanceOf(Location::class, $location = $message->getLocation());
-        $this->assertSame($latitude, $location->getLatitude());
-        $this->assertSame($longitude, $location->getLongitude());
-        $this->assertNull($message->getText());
-        $this->assertNull($message->getAttachment());
-    }
+        $chat = $this->facebook->getChat();
 
-    public function test_getMessageAttachments()
-    {
-        $this->mock(Client::class);
-
-        $this->facebook->fill($this->parameters, $this->generateAttachmentResponse('audio'));
-        $this->assertInstanceOf(Attachment::class, $this->facebook->getMessage()->getAttachment());
-        $this->assertSame(Attachment::TYPE_AUDIO, $this->facebook->getMessage()->getAttachment()->getType());
-        $this->assertTrue($this->facebook->getMessage()->hasAttachment());
-
-        $this->facebook->fill($this->parameters, $this->generateAttachmentResponse('image'));
-        $this->assertSame(Attachment::TYPE_IMAGE, $this->facebook->getMessage()->getAttachment()->getType());
-        $this->assertTrue($this->facebook->getMessage()->hasAttachment());
-
-        $this->facebook->fill($this->parameters, $this->generateAttachmentResponse('video'));
-        $this->assertSame(Attachment::TYPE_VIDEO, $this->facebook->getMessage()->getAttachment()->getType());
-        $this->assertTrue($this->facebook->getMessage()->hasAttachment());
-
-        $this->facebook->fill($this->parameters, $this->generateAttachmentResponse('file'));
-        $this->assertSame(Attachment::TYPE_FILE, $this->facebook->getMessage()->getAttachment()->getType());
-        $this->assertTrue($this->facebook->getMessage()->hasAttachment());
+        $this->assertInstanceOf(Chat::class, $chat);
+        $this->assertSame($id, $chat->getId());
+        $this->assertSame(Chat::TYPE_PRIVATE, $chat->getType());
+        $this->assertSame('', $chat->getTitle());
     }
 
     public function test_verify_webhook_check()
@@ -272,6 +238,20 @@ class FacebookDriverTest extends TestCase
 
         $this->assertTrue($this->facebook->isVerificationRequest());
         $this->facebook->verifyWebhook();
+    }
+
+    public function test_handle()
+    {
+        $id = $this->faker()->uuid;
+        $text = $this->faker()->word;
+
+        $chat = new Chat($id, '');
+        $user = new User($id);
+        $command = new SendMessage($chat, $user, $text);
+
+        $this->guzzle->shouldReceive('post');
+
+        $this->facebook->handle($command);
     }
 
     private function generateSignature(array $data, $key): string
