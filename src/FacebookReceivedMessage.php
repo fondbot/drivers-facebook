@@ -4,19 +4,17 @@ declare(strict_types=1);
 
 namespace FondBot\Drivers\Facebook;
 
-use GuzzleHttp\Client;
+use FondBot\Helpers\Arr;
 use FondBot\Drivers\ReceivedMessage;
 use FondBot\Drivers\ReceivedMessage\Location;
 use FondBot\Drivers\ReceivedMessage\Attachment;
 
 class FacebookReceivedMessage implements ReceivedMessage
 {
-    private $guzzle;
     private $payload;
 
-    public function __construct(Client $guzzle, array $payload)
+    public function __construct(array $payload)
     {
-        $this->guzzle = $guzzle;
         $this->payload = $payload;
     }
 
@@ -79,7 +77,7 @@ class FacebookReceivedMessage implements ReceivedMessage
      */
     public function hasData(): bool
     {
-        return false;
+        return Arr::has($this->payload, ['quick_reply.payload']) || Arr::has($this->payload, ['postback.payload']);
     }
 
     /**
@@ -89,7 +87,7 @@ class FacebookReceivedMessage implements ReceivedMessage
      */
     public function getData(): ?string
     {
-        return null;
+        return Arr::get($this->payload, 'quick_reply.payload') ?: Arr::get($this->payload, 'postback.payload');
     }
 
     /**
@@ -97,10 +95,10 @@ class FacebookReceivedMessage implements ReceivedMessage
      *
      * @return Attachment|null
      */
-    public function getImage(): ?Attachment
+    protected function getImage(): ?Attachment
     {
         if ($image = $this->getAttachmentPayload('image')) {
-            return new Attachment(Attachment::TYPE_IMAGE, $image['url'], $this->guzzle);
+            return new Attachment(Attachment::TYPE_IMAGE, $image['url']);
         }
 
         return null;
@@ -111,10 +109,10 @@ class FacebookReceivedMessage implements ReceivedMessage
      *
      * @return Attachment|null
      */
-    public function getAudio(): ?Attachment
+    protected function getAudio(): ?Attachment
     {
         if ($audio = $this->getAttachmentPayload('audio')) {
-            return new Attachment(Attachment::TYPE_AUDIO, $audio['url'], $this->guzzle);
+            return new Attachment(Attachment::TYPE_AUDIO, $audio['url']);
         }
 
         return null;
@@ -125,10 +123,10 @@ class FacebookReceivedMessage implements ReceivedMessage
      *
      * @return Attachment|null
      */
-    public function getVideo(): ?Attachment
+    protected function getVideo(): ?Attachment
     {
         if ($video = $this->getAttachmentPayload('video')) {
-            return new Attachment(Attachment::TYPE_VIDEO, $video['url'], $this->guzzle);
+            return new Attachment(Attachment::TYPE_VIDEO, $video['url']);
         }
 
         return null;
@@ -139,16 +137,16 @@ class FacebookReceivedMessage implements ReceivedMessage
      *
      * @return Attachment|null
      */
-    public function getFile(): ?Attachment
+    protected function getFile(): ?Attachment
     {
         if ($file = $this->getAttachmentPayload('file')) {
-            return new Attachment(Attachment::TYPE_FILE, $file['url'], $this->guzzle);
+            return new Attachment(Attachment::TYPE_FILE, $file['url']);
         }
 
         return null;
     }
 
-    private function getAttachmentPayload(string $type): ?array
+    protected function getAttachmentPayload(string $type): ?array
     {
         if (!$attachments = $this->payload['attachments'] ?? null) {
             return null;
@@ -156,7 +154,7 @@ class FacebookReceivedMessage implements ReceivedMessage
 
         // Is it real to send many locations or something in one request?
         return collect($attachments)->first(function ($attachment) use ($type) {
-            return $attachment['type'] === $type;
-        })['payload'] ?? null;
+                return $attachment['type'] === $type;
+            })['payload'] ?? null;
     }
 }
