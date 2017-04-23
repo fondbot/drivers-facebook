@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace FondBot\Drivers\Facebook\Templates\Objects;
 
-use FondBot\Drivers\Facebook\Templates\AbstractTemplate;
+use FondBot\Contracts\Arrayable;
+use JsonSerializable;
 
-class Address extends AbstractTemplate
+class Address implements Arrayable, JsonSerializable
 {
     private $street;
     private $secondaryStreet;
@@ -34,7 +35,7 @@ class Address extends AbstractTemplate
         return new static($street, $city, $postalCode, $state, $country);
     }
 
-    public function transform(): array
+    public function toArray(): array
     {
         return [
             'street_1' => $this->street,
@@ -44,6 +45,11 @@ class Address extends AbstractTemplate
             'state' => $this->state,
             'country' => $this->country,
         ];
+    }
+
+    public function jsonSerialize()
+    {
+        return $this->toArray();
     }
 
     public function getStreet(): string

@@ -38,4 +38,39 @@ class Summary implements Arrayable, JsonSerializable
     {
         return $this->toArray();
     }
+
+    public function getSubtotal(): ?float
+    {
+        return $this->subtotal;
+    }
+
+    public function setSubtotal(float $subtotal)
+    {
+        $this->subtotal = $subtotal;
+    }
+
+    public function getShippingCost(): ?float
+    {
+        return $this->shippingCost;
+    }
+
+    public function setShippingCost(float $shippingCost)
+    {
+        $this->shippingCost = $shippingCost;
+    }
+
+    public function getTotalTax(): ?float
+    {
+        return $this->totalTax;
+    }
+
+    public function setTotalTax(float $totalTax)
+    {
+        $this->totalTax = $totalTax;
+    }
+
+    public function getTotalCost(): float
+    {
+        return $this->totalCost;
+    }
 }

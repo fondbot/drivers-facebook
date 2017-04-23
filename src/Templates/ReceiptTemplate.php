@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace FondBot\Drivers\Facebook\Templates;
 
+use FondBot\Contracts\Arrayable;
+use FondBot\Conversation\Template;
 use FondBot\Drivers\Facebook\Templates\Objects\Address;
 use FondBot\Drivers\Facebook\Templates\Objects\Adjustment;
 use FondBot\Drivers\Facebook\Templates\Objects\Element;
 use FondBot\Drivers\Facebook\Templates\Objects\Summary;
+use JsonSerializable;
 
-class ReceiptTemplate extends AbstractTemplate
+class ReceiptTemplate implements Template, Arrayable, JsonSerializable
 {
     private $orderNumber;
     private $merchantName;
@@ -34,7 +37,7 @@ class ReceiptTemplate extends AbstractTemplate
         $this->recipientName = $recipientName;
         $this->currency = $currency;
         $this->paymentMethod = $paymentMethod;
-        $this->summary = $summary;
+        $this->summary = $summary->toArray();
     }
 
     public static function create(
@@ -47,7 +50,7 @@ class ReceiptTemplate extends AbstractTemplate
         return new static($orderNumber, $recipientName, $currency, $paymentMethod, $summary);
     }
 
-    public function transform(): array
+    public function toArray(): array
     {
         return [
             'attachment' => [
@@ -68,6 +71,11 @@ class ReceiptTemplate extends AbstractTemplate
                 ],
             ],
         ];
+    }
+
+    public function jsonSerialize()
+    {
+        return $this->toArray();
     }
 
     public function getOrderNumber(): string
@@ -130,20 +138,20 @@ class ReceiptTemplate extends AbstractTemplate
 
     public function addElement(Element $element)
     {
-        $this->elements[] = $element;
+        $this->elements[] = $element->toArray();
     }
 
-    public function getAddress(): ?Address
+    public function getAddress(): ?array
     {
         return $this->address;
     }
 
     public function setAddress(Address $address)
     {
-        $this->address = $address;
+        $this->address = $address->toArray();
     }
 
-    public function getSummary(): Summary
+    public function getSummary(): array
     {
         return $this->summary;
     }
@@ -158,6 +166,6 @@ class ReceiptTemplate extends AbstractTemplate
 
     public function addAdjustment(Adjustment $adjustment)
     {
-        $this->adjustments[] = $adjustment;
+        $this->adjustments[] = $adjustment->toArray();
     }
 }

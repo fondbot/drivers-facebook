@@ -18,15 +18,10 @@ class ReceiptTemplateTest extends TestCase
         $address = $this->mock(Address::class);
         $adjustment = $this->mock(Adjustment::class);
 
-        $summary->shouldReceive('transform')->andReturn([]);
-        $element->shouldReceive('transform')->andReturn([]);
-        $address->shouldReceive('transform')->andReturn([]);
-        $adjustment->shouldReceive('transform')->andReturn([]);
-
-        $summary->shouldReceive('jsonSerialize')->andReturn([]);
-        $element->shouldReceive('jsonSerialize')->andReturn([]);
-        $address->shouldReceive('jsonSerialize')->andReturn([]);
-        $adjustment->shouldReceive('jsonSerialize')->andReturn([]);
+        $summary->shouldReceive('toArray')->andReturn([]);
+        $element->shouldReceive('toArray')->andReturn([]);
+        $address->shouldReceive('toArray')->andReturn([]);
+        $adjustment->shouldReceive('toArray')->andReturn([]);
 
         $template = ReceiptTemplate::create(
             $orderNumber = $this->faker()->uuid,
@@ -44,19 +39,19 @@ class ReceiptTemplateTest extends TestCase
         $this->assertSame($recipientName, $template->getRecipientName());
         $this->assertSame($currency, $template->getCurrency());
         $this->assertSame($paymentMethod, $template->getPaymentMethod());
-        $this->assertSame($summary, $template->getSummary());
+        $this->assertSame($summary->toArray(), $template->getSummary());
         $this->assertSame($merchantName, $template->getMerchantName());
         $this->assertSame($timestamp, $template->getTimestamp());
         $this->assertSame($url, $template->getOrderUrl());
 
         $template->addElement($element);
-        $this->assertSame($elements = [$element], $template->getElements());
+        $this->assertSame($elements = [$element->toArray()], $template->getElements());
 
         $template->setAddress($address);
-        $this->assertSame($address, $template->getAddress());
+        $this->assertSame($address->toArray(), $template->getAddress());
 
         $template->addAdjustment($adjustment);
-        $this->assertSame($adjustments = [$adjustment], $template->getAdjustments());
+        $this->assertSame($adjustments = [$adjustment->toArray()], $template->getAdjustments());
 
         $result = [
             'attachment' => [
@@ -71,15 +66,14 @@ class ReceiptTemplateTest extends TestCase
                     'timestamp' => $timestamp,
                     'order_url' => $url,
                     'elements' => $elements,
-                    'address' => $address,
-                    'summary' => $summary,
+                    'address' => $address->toArray(),
+                    'summary' => $summary->toArray(),
                     'adjustments' => $adjustments,
                 ],
             ],
         ];
 
         $this->assertSame($result, $template->toArray());
-
         $this->assertSame(json_encode($result), json_encode($template));
     }
 }
