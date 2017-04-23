@@ -57,11 +57,6 @@ class Address implements Arrayable, JsonSerializable
         return $this->street;
     }
 
-    public function setStreet(string $street)
-    {
-        $this->street = $street;
-    }
-
     public function getSecondaryStreet(): ?string
     {
         return $this->secondaryStreet;
@@ -77,19 +72,9 @@ class Address implements Arrayable, JsonSerializable
         return $this->city;
     }
 
-    public function setCity(string $city)
-    {
-        $this->city = $city;
-    }
-
     public function getPostalCode(): string
     {
         return $this->postalCode;
-    }
-
-    public function setPostalCode(string $postalCode)
-    {
-        $this->postalCode = $postalCode;
     }
 
     public function getState(): string
@@ -97,18 +82,8 @@ class Address implements Arrayable, JsonSerializable
         return $this->state;
     }
 
-    public function setState(string $state)
-    {
-        $this->state = $state;
-    }
-
     public function getCountry(): string
     {
         return $this->country;
-    }
-
-    public function setCountry(string $country)
-    {
-        $this->country = $country;
     }
 }
