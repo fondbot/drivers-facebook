@@ -4,16 +4,21 @@ declare(strict_types=1);
 
 namespace FondBot\Drivers\Facebook;
 
-use FondBot\Drivers\Chat;
 use GuzzleHttp\Client;
+use FondBot\Drivers\Chat;
 use FondBot\Drivers\User;
 use FondBot\Drivers\Driver;
 use FondBot\Drivers\Command;
 use FondBot\Drivers\ReceivedMessage;
 use FondBot\Queue\SerializesForQueue;
+use FondBot\Drivers\Commands\SendMessage;
 use GuzzleHttp\Exception\RequestException;
+use FondBot\Drivers\Commands\SendAttachment;
 use FondBot\Drivers\Exceptions\InvalidRequest;
 use FondBot\Drivers\Extensions\WebhookVerification;
+use FondBot\Drivers\Exceptions\InvalidConfiguration;
+use FondBot\Drivers\Facebook\Commands\SendMessageAdapter;
+use FondBot\Drivers\Facebook\Commands\SendAttachmentAdapter;
 
 class FacebookDriver extends Driver implements WebhookVerification
 {
@@ -130,14 +135,22 @@ class FacebookDriver extends Driver implements WebhookVerification
      * Handle command.
      *
      * @param Command $command
+     *
+     * @throws InvalidConfiguration
      */
     public function handle(Command $command): void
     {
-        $content = ContentResolver::resolve($command);
+        if ($command instanceof SendMessage) {
+            $adapter = new SendMessageAdapter($command);
+        } elseif ($command instanceof SendAttachment) {
+            $adapter = new SendAttachmentAdapter($command);
+        } else {
+            throw new InvalidConfiguration('Not resolved command instance.');
+        }
 
         $this->getGuzzle()->post(
             self::API_URL.'me/messages',
-            $this->getDefaultRequestParameters() + [$content->encodeType() => $content->toArray()]
+            $this->getDefaultRequestParameters() + [$adapter->encodeType() => $adapter->toArray()]
         );
     }
 

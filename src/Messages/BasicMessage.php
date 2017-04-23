@@ -2,13 +2,12 @@
 
 declare(strict_types=1);
 
-namespace FondBot\Drivers\Facebook\Contents;
+namespace FondBot\Drivers\Facebook\Messages;
 
-use FondBot\Conversation\Keyboard;
 use FondBot\Drivers\Commands\SendMessage;
-use FondBot\Drivers\Facebook\ContentInterface;
+use FondBot\Conversation\Templates\Keyboard;
 
-class Message implements ContentInterface
+class BasicMessage implements Content
 {
     private $command;
 
@@ -33,8 +32,8 @@ class Message implements ContentInterface
             ],
         ];
 
-        if ($this->command->keyboard instanceof Keyboard) {
-            $payload['message']['quick_replies'] = $this->compileKeyboard();
+        if ($this->command->template instanceof Keyboard) {
+            $payload['message']['quick_replies'] = $this->compileQuickReplies();
         }
 
         return $payload;
@@ -45,11 +44,14 @@ class Message implements ContentInterface
         return 'json';
     }
 
-    private function compileKeyboard(): array
+    private function compileQuickReplies(): array
     {
+        /** @var Keyboard $keyboard */
+        $keyboard = $this->command->template;
+
         $payload = [];
 
-        foreach ($this->command->keyboard->getButtons() as $button) {
+        foreach ($keyboard->getButtons() as $button) {
             $payload[] = [
                 'content_type' => 'text',
                 'title' => $button->getLabel(),

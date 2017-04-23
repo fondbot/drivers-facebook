@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace FondBot\Drivers\Facebook\Contents;
+namespace FondBot\Drivers\Facebook\Commands;
 
 use FondBot\Drivers\Commands\SendAttachment;
-use FondBot\Drivers\Facebook\ContentInterface;
+use FondBot\Drivers\Facebook\Messages\Content;
 
-class Attachment implements ContentInterface
+class SendAttachmentAdapter implements Content
 {
     private $command;
 

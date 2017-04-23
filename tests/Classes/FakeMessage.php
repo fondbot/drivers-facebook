@@ -25,7 +25,6 @@ class FakeMessage
         return $this->senderId;
     }
 
-
     /**
      * @return string
      */

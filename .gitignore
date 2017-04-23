@@ -7,6 +7,7 @@ Thumbs.db
 .php_cs.cache
 .discovery
 
+studio.json
 clover.xml
 composer.lock
 _ide_helper.php
