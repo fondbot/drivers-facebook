@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace FondBot\Drivers\Facebook\Contents\Buttons;
 
-use FondBot\Conversation\Buttons\Button;
+use FondBot\Conversation\Templates\Keyboard\Button;
 
 class CallButton implements Button
 {
