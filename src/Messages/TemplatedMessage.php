@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace FondBot\Drivers\Facebook\Contents;
+namespace FondBot\Drivers\Facebook\Messages;
 
-use FondBot\Conversation\Buttons\PayloadButton;
-use FondBot\Conversation\Buttons\ReplyButton;
-use FondBot\Conversation\Buttons\UrlButton;
 use FondBot\Drivers\Commands\SendMessage;
+use FondBot\Conversation\Templates\Keyboard;
 use FondBot\Drivers\Exceptions\InvalidArgument;
-use FondBot\Drivers\Facebook\ContentInterface;
-use FondBot\Drivers\Facebook\Contents\Buttons\CallButton;
+use FondBot\Conversation\Templates\Keyboard\UrlButton;
+use FondBot\Conversation\Templates\Keyboard\ReplyButton;
+use FondBot\Conversation\Templates\Keyboard\PayloadButton;
+use FondBot\Drivers\Facebook\Messages\Keyboard\Buttons\CallButton;
 
-class Template implements ContentInterface
+class TemplatedMessage implements Content
 {
     private $command;
 
@@ -52,9 +52,12 @@ class Template implements ContentInterface
 
     private function compileButtons(): array
     {
+        /** @var Keyboard $keyboard */
+        $keyboard = $this->command->template;
+
         $buttons = [];
 
-        foreach ($this->command->keyboard->getButtons() as $button) {
+        foreach ($keyboard->getButtons() as $button) {
             $payload = [
                 'title' => $button->getLabel(),
             ];

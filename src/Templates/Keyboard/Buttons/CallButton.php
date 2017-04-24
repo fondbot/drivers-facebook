@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace FondBot\Drivers\Facebook\Contents\Buttons;
+namespace FondBot\Drivers\Facebook\Messages\Keyboard\Buttons;
 
 use FondBot\Conversation\Templates\Keyboard\Button;
 

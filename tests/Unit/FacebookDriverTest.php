@@ -4,18 +4,16 @@ declare(strict_types=1);
 
 namespace Tests\Unit;
 
-use FondBot\Drivers\Chat;
-use FondBot\Drivers\Commands\SendMessage;
 use Tests\TestCase;
 use GuzzleHttp\Client;
 use FondBot\Helpers\Str;
+use FondBot\Drivers\Chat;
 use FondBot\Drivers\User;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
+use FondBot\Drivers\Commands\SendMessage;
 use GuzzleHttp\Exception\RequestException;
 use FondBot\Drivers\Facebook\FacebookDriver;
-use FondBot\Drivers\ReceivedMessage\Location;
-use FondBot\Drivers\ReceivedMessage\Attachment;
 use FondBot\Drivers\Facebook\FacebookReceivedMessage;
 
 /**

@@ -154,7 +154,7 @@ class FacebookReceivedMessage implements ReceivedMessage
 
         // Is it real to send many locations or something in one request?
         return collect($attachments)->first(function ($attachment) use ($type) {
-                return $attachment['type'] === $type;
-            })['payload'] ?? null;
+            return $attachment['type'] === $type;
+        })['payload'] ?? null;
     }
 }
