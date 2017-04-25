@@ -44,9 +44,11 @@ class Summary implements Arrayable, JsonSerializable
         return $this->subtotal;
     }
 
-    public function setSubtotal(float $subtotal)
+    public function setSubtotal(float $subtotal): Summary
     {
         $this->subtotal = $subtotal;
+
+        return $this;
     }
 
     public function getShippingCost(): ?float
@@ -54,9 +56,11 @@ class Summary implements Arrayable, JsonSerializable
         return $this->shippingCost;
     }
 
-    public function setShippingCost(float $shippingCost)
+    public function setShippingCost(float $shippingCost): Summary
     {
         $this->shippingCost = $shippingCost;
+
+        return $this;
     }
 
     public function getTotalTax(): ?float
@@ -64,9 +68,11 @@ class Summary implements Arrayable, JsonSerializable
         return $this->totalTax;
     }
 
-    public function setTotalTax(float $totalTax)
+    public function setTotalTax(float $totalTax): Summary
     {
         $this->totalTax = $totalTax;
+
+        return $this;
     }
 
     public function getTotalCost(): float

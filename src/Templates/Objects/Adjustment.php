@@ -35,9 +35,11 @@ class Adjustment implements Arrayable, JsonSerializable
         return $this->name;
     }
 
-    public function setName(string $name)
+    public function setName(string $name): Adjustment
     {
         $this->name = $name;
+
+        return $this;
     }
 
     public function getAmount(): ?float
@@ -45,8 +47,10 @@ class Adjustment implements Arrayable, JsonSerializable
         return $this->amount;
     }
 
-    public function setAmount(float $amount)
+    public function setAmount(float $amount): Adjustment
     {
         $this->amount = $amount;
+
+        return $this;
     }
 }

@@ -88,9 +88,11 @@ class ReceiptTemplate implements Template, Arrayable, JsonSerializable
         return $this->merchantName;
     }
 
-    public function setMerchantName(string $merchantName)
+    public function setMerchantName(string $merchantName): ReceiptTemplate
     {
         $this->merchantName = $merchantName;
+
+        return $this;
     }
 
     public function getRecipientName(): string
@@ -113,9 +115,11 @@ class ReceiptTemplate implements Template, Arrayable, JsonSerializable
         return $this->timestamp;
     }
 
-    public function setTimestamp(string $timestamp)
+    public function setTimestamp(string $timestamp): ReceiptTemplate
     {
         $this->timestamp = $timestamp;
+
+        return $this;
     }
 
     public function getOrderUrl(): ?string
@@ -123,9 +127,11 @@ class ReceiptTemplate implements Template, Arrayable, JsonSerializable
         return $this->orderUrl;
     }
 
-    public function setOrderUrl(string $orderUrl)
+    public function setOrderUrl(string $orderUrl): ReceiptTemplate
     {
         $this->orderUrl = $orderUrl;
+
+        return $this;
     }
 
     /**
@@ -139,6 +145,8 @@ class ReceiptTemplate implements Template, Arrayable, JsonSerializable
     public function addElement(Element $element)
     {
         $this->elements[] = $element->toArray();
+
+        return $this;
     }
 
     public function getAddress(): ?array
@@ -146,9 +154,11 @@ class ReceiptTemplate implements Template, Arrayable, JsonSerializable
         return $this->address;
     }
 
-    public function setAddress(Address $address)
+    public function setAddress(Address $address): ReceiptTemplate
     {
         $this->address = $address->toArray();
+
+        return $this;
     }
 
     public function getSummary(): array

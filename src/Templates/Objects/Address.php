@@ -62,9 +62,11 @@ class Address implements Arrayable, JsonSerializable
         return $this->secondaryStreet;
     }
 
-    public function setSecondaryStreet(string $secondaryStreet)
+    public function setSecondaryStreet(string $secondaryStreet): Address
     {
         $this->secondaryStreet = $secondaryStreet;
+
+        return $this;
     }
 
     public function getCity(): string

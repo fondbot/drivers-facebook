@@ -49,19 +49,16 @@ class Element implements Arrayable, JsonSerializable
         return $this->title;
     }
 
-    public function setTitle(string $title)
-    {
-        $this->title = $title;
-    }
-
     public function getSubtitle(): ?string
     {
         return $this->subtitle;
     }
 
-    public function setSubtitle(string $subtitle)
+    public function setSubtitle(string $subtitle): Element
     {
         $this->subtitle = $subtitle;
+
+        return $this;
     }
 
     public function getQuantity(): ?int
@@ -69,9 +66,11 @@ class Element implements Arrayable, JsonSerializable
         return $this->quantity;
     }
 
-    public function setQuantity(int $quantity)
+    public function setQuantity(int $quantity): Element
     {
         $this->quantity = $quantity;
+
+        return $this;
     }
 
     public function getPrice(): float
@@ -79,19 +78,16 @@ class Element implements Arrayable, JsonSerializable
         return $this->price;
     }
 
-    public function setPrice(float $price)
-    {
-        $this->price = $price;
-    }
-
     public function getCurrency(): ?string
     {
         return $this->currency;
     }
 
-    public function setCurrency(string $currency)
+    public function setCurrency(string $currency): Element
     {
         $this->currency = $currency;
+
+        return $this;
     }
 
     public function getImageUrl(): ?string
@@ -99,8 +95,10 @@ class Element implements Arrayable, JsonSerializable
         return $this->imageUrl;
     }
 
-    public function setImageUrl(string $imageUrl)
+    public function setImageUrl(string $imageUrl): Element
     {
         $this->imageUrl = $imageUrl;
+
+        return $this;
     }
 }
