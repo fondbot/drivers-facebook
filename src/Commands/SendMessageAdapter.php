@@ -21,7 +21,6 @@ class SendMessageAdapter implements Content
     public function __construct(SendMessage $command)
     {
         $this->command = $command;
-        $this->resolveContent();
     }
 
     /**
