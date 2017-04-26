@@ -4,15 +4,12 @@ declare(strict_types=1);
 
 namespace FondBot\Drivers\Facebook\Templates;
 
-use FondBot\Contracts\Arrayable;
-use FondBot\Conversation\Template;
 use FondBot\Drivers\Facebook\Templates\Objects\Address;
 use FondBot\Drivers\Facebook\Templates\Objects\Adjustment;
 use FondBot\Drivers\Facebook\Templates\Objects\Element;
 use FondBot\Drivers\Facebook\Templates\Objects\Summary;
-use JsonSerializable;
 
-class ReceiptTemplate implements Template, Arrayable, JsonSerializable
+class ReceiptTemplate implements TemplateInterface
 {
     private $orderNumber;
     private $merchantName;
@@ -174,8 +171,10 @@ class ReceiptTemplate implements Template, Arrayable, JsonSerializable
         return $this->adjustments;
     }
 
-    public function addAdjustment(Adjustment $adjustment)
+    public function addAdjustment(Adjustment $adjustment): ReceiptTemplate
     {
         $this->adjustments[] = $adjustment->toArray();
+
+        return $this;
     }
 }

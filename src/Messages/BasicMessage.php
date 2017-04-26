@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace FondBot\Drivers\Facebook\Messages;
 
-use FondBot\Drivers\Commands\SendMessage;
 use FondBot\Conversation\Templates\Keyboard;
+use FondBot\Drivers\Commands\SendMessage;
 
-class BasicMessage implements Content
+class BasicMessage
 {
     private $command;
 
@@ -24,24 +24,14 @@ class BasicMessage implements Content
     public function toArray(): array
     {
         $payload = [
-            'recipient' => [
-                'id' => $this->command->chat->getId(),
-            ],
-            'message' => [
-                'text' => $this->command->text,
-            ],
+            'text' => $this->command->text,
         ];
 
         if ($this->command->template instanceof Keyboard) {
-            $payload['message']['quick_replies'] = $this->compileQuickReplies();
+            $payload['quick_replies'] = $this->compileQuickReplies();
         }
 
         return $payload;
-    }
-
-    public function encodeType(): string
-    {
-        return 'json';
     }
 
     private function compileQuickReplies(): array

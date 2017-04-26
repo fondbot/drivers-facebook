@@ -4,20 +4,19 @@ declare(strict_types=1);
 
 namespace FondBot\Drivers\Facebook\Commands;
 
-use FondBot\Drivers\Commands\SendMessage;
+use FondBot\Conversation\Template;
 use FondBot\Conversation\Templates\Keyboard;
-use FondBot\Drivers\Facebook\Messages\Content;
 use FondBot\Conversation\Templates\Keyboard\Button;
-use FondBot\Drivers\Facebook\Messages\BasicMessage;
 use FondBot\Conversation\Templates\Keyboard\UrlButton;
+use FondBot\Drivers\Commands\SendMessage;
+use FondBot\Drivers\Facebook\Messages\BasicMessage;
+use FondBot\Drivers\Facebook\Messages\Content;
 use FondBot\Drivers\Facebook\Messages\TemplatedMessage;
+use FondBot\Drivers\Facebook\Templates\TemplateInterface;
 
 class SendMessageAdapter implements Content
 {
     private $command;
-
-    /** @var Content */
-    private $content;
 
     public function __construct(SendMessage $command)
     {
@@ -32,29 +31,44 @@ class SendMessageAdapter implements Content
      */
     public function toArray(): array
     {
-        return $this->content->toArray();
+        return [
+            'recipient' => [
+                'id' => $this->command->chat->getId(),
+            ],
+            'message' => $this->resolveContent(),
+        ];
     }
 
     public function encodeType(): string
     {
-        return $this->content->encodeType();
+        return 'json';
     }
 
-    private function resolveContent(): void
+    private function resolveContent(): array
     {
-        if ($this->hasCustomButtons()) {
-            $this->content = new TemplatedMessage($this->command);
-        } else {
-            $this->content = new BasicMessage($this->command);
+        if (null === $template = $this->command->template) {
+            return (new BasicMessage($this->command))->toArray();
         }
+
+        return $this->compileTemplate($template);
     }
+
+    private function compileTemplate(Template $template): array
+    {
+        if ($template instanceof TemplateInterface) {
+            return $template->toArray();
+        }
+
+        if ($template instanceof Keyboard && $this->hasCustomButtons()) {
+            return (new TemplatedMessage($this->command))->toArray();
+        }
+
+        return (new BasicMessage($this->command))->toArray();
+    }
+
 
     private function hasCustomButtons(): bool
     {
-        if (!$this->command->template instanceof Keyboard) {
-            return false;
-        }
-
         /** @var Keyboard $keyboard */
         $keyboard = $this->command->template;
 
