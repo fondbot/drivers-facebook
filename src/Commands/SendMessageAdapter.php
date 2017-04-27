@@ -6,12 +6,14 @@ namespace FondBot\Drivers\Facebook\Commands;
 
 use FondBot\Conversation\Template;
 use FondBot\Conversation\Templates\Keyboard;
-use FondBot\Conversation\Templates\Keyboard\Button;
-use FondBot\Conversation\Templates\Keyboard\UrlButton;
 use FondBot\Drivers\Commands\SendMessage;
+use FondBot\Drivers\Exceptions\InvalidConfiguration;
 use FondBot\Drivers\Facebook\Messages\BasicMessage;
 use FondBot\Drivers\Facebook\Messages\Content;
-use FondBot\Drivers\Facebook\Messages\TemplatedMessage;
+use FondBot\Drivers\Facebook\Messages\Keyboard\Buttons\CallButton;
+use FondBot\Drivers\Facebook\Messages\Objects\QuickReplies;
+use FondBot\Drivers\Facebook\Messages\QuickReplyMessage;
+use FondBot\Drivers\Facebook\Templates\ButtonTemplate;
 use FondBot\Drivers\Facebook\Templates\TemplateInterface;
 
 class SendMessageAdapter implements Content
@@ -45,11 +47,11 @@ class SendMessageAdapter implements Content
 
     private function resolveContent(): array
     {
-        if (null === $template = $this->command->template) {
-            return (new BasicMessage($this->command))->toArray();
+        if ($this->command->template !== null) {
+            return $this->compileTemplate($this->command->template);
         }
 
-        return $this->compileTemplate($template);
+        return BasicMessage::create($this->command->text)->toArray();
     }
 
     private function compileTemplate(Template $template): array
@@ -58,21 +60,47 @@ class SendMessageAdapter implements Content
             return $template->toArray();
         }
 
-        if ($template instanceof Keyboard && $this->hasCustomButtons()) {
-            return (new TemplatedMessage($this->command))->toArray();
+        if ($template instanceof Keyboard) {
+            return $this->compileKeyboard($template);
         }
 
-        return (new BasicMessage($this->command))->toArray();
+        throw new InvalidConfiguration('Not resolved template instance');
+    }
+
+    private function compileKeyboard(Keyboard $keyboard): array
+    {
+        if ($this->hasCustomButtons($keyboard)) {
+            $template = ButtonTemplate::create($this->command->text);
+
+            foreach ($keyboard->getButtons() as $button) {
+                if ($button instanceof Keyboard\UrlButton) {
+                    $template->addUrlButton($button->getUrl(), $button->getLabel(), $button->getParameters());
+                } elseif ($button instanceof Keyboard\PayloadButton) {
+                    $template->addPostBackButton($button->getLabel(), $button->getPayload());
+                } elseif ($button instanceof CallButton) {
+                    $template->addCallButton($button->getLabel(), $button->getPhone());
+                } else {
+                    $template->addPostBackButton($button->getLabel(), $button->getLabel());
+                }
+            }
+
+            return $template->toArray();
+        }
+
+        $replies = QuickReplies::create();
+
+        foreach ($keyboard->getButtons() as $button) {
+            $replies->addButton($button->getLabel(), $button->getLabel());
+        }
+
+        return QuickReplyMessage::create($this->command->text, $replies)->toArray();
     }
 
 
-    private function hasCustomButtons(): bool
+    private function hasCustomButtons(Keyboard $keyboard): bool
     {
-        /** @var Keyboard $keyboard */
-        $keyboard = $this->command->template;
-
-        return (bool) collect($keyboard->getButtons())->first(function (Button $button) {
-            return $button instanceof UrlButton;
+        return (bool) collect($keyboard->getButtons())->first(function (Keyboard\Button $button) {
+            return $button instanceof Keyboard\UrlButton;
         });
     }
 }

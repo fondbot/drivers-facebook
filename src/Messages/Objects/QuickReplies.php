@@ -10,16 +10,29 @@ class QuickReplies implements Arrayable
 {
     private $items;
 
-    public function addButton(Button $button): QuickReplies
+    public static function create(): QuickReplies
     {
-        $this->items[] = $button->toArray();
+        return new static;
+    }
+
+    public function addButton(string $title, string $payload, string $imageUrl = null): QuickReplies
+    {
+        $this->items[] = [
+            'content_type' => 'text',
+            'title' => $title,
+            'payload' => $payload,
+            'image_url' => $imageUrl,
+        ];
 
         return $this;
     }
 
-    public function addLocation(Location $location): QuickReplies
+    public function addLocation(string $imageUrl = null): QuickReplies
     {
-        $this->items[] = $location->toArray();
+        $this->items[] = [
+            'content_type' => 'location',
+            'image_url' => $imageUrl,
+        ];
 
         return $this;
     }

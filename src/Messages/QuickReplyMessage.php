@@ -5,22 +5,29 @@ declare(strict_types=1);
 namespace FondBot\Drivers\Facebook\Messages;
 
 use FondBot\Contracts\Arrayable;
-use FondBot\Conversation\Template;
-use JsonSerializable;
+use FondBot\Drivers\Facebook\Messages\Objects\QuickReplies;
 
-class QuickReplyMessage implements Template, Arrayable, JsonSerializable
+class QuickReplyMessage implements Arrayable
 {
-    public function __construct(string $text)
+    private $text;
+    private $replies;
+
+    public function __construct(string $text, QuickReplies $replies)
     {
+        $this->text = $text;
+        $this->replies = $replies->toArray();
+    }
+
+    public static function create(string $text, QuickReplies $replies): QuickReplyMessage
+    {
+        return new static($text, $replies);
     }
 
     public function toArray(): array
     {
-        return [];
-    }
-
-    public function jsonSerialize()
-    {
-        return $this->toArray();
+        return [
+            'text' => $this->text,
+            'quick_replies' => $this->replies,
+        ];
     }
 }
