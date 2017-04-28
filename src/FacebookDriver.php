@@ -154,7 +154,7 @@ class FacebookDriver extends Driver implements WebhookVerification
         );
     }
 
-    protected function getGuzzle()
+    protected function getGuzzle(): Client
     {
         return $this->guzzle ?: new Client();
     }

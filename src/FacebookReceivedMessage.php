@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace FondBot\Drivers\Facebook;
 
 use FondBot\Helpers\Arr;
+use FondBot\Templates\Location;
+use FondBot\Templates\Attachment;
 use FondBot\Drivers\ReceivedMessage;
-use FondBot\Drivers\ReceivedMessage\Location;
-use FondBot\Drivers\ReceivedMessage\Attachment;
 
 class FacebookReceivedMessage implements ReceivedMessage
 {

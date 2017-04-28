@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace FondBot\Drivers\Facebook\Commands;
 
+use FondBot\Templates\Keyboard;
 use FondBot\Conversation\Template;
 use FondBot\Drivers\Commands\SendMessage;
-use FondBot\Conversation\Templates\Keyboard;
 use FondBot\Drivers\Facebook\Messages\Content;
 use FondBot\Drivers\Facebook\Messages\BasicMessage;
 use FondBot\Drivers\Exceptions\InvalidConfiguration;

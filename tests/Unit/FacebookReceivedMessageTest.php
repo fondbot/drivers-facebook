@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Tests\Unit;
 
 use Tests\TestCase;
+use FondBot\Templates\Location;
+use FondBot\Templates\Attachment;
 use Tests\Classes\FakeAttachmentsContainer;
-use FondBot\Drivers\ReceivedMessage\Location;
 use Tests\Classes\Contracts\PayloadInterface;
-use FondBot\Drivers\ReceivedMessage\Attachment;
 use Tests\Classes\Contents\FakeLocationContent;
 use Tests\Classes\Contents\FakeAttachmentContent;
 use FondBot\Drivers\Facebook\FacebookReceivedMessage;
