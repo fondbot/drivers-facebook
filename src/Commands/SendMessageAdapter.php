@@ -5,16 +5,15 @@ declare(strict_types=1);
 namespace FondBot\Drivers\Facebook\Commands;
 
 use FondBot\Conversation\Template;
-use FondBot\Conversation\Templates\Keyboard;
 use FondBot\Drivers\Commands\SendMessage;
-use FondBot\Drivers\Exceptions\InvalidConfiguration;
-use FondBot\Drivers\Facebook\Messages\BasicMessage;
+use FondBot\Conversation\Templates\Keyboard;
 use FondBot\Drivers\Facebook\Messages\Content;
-use FondBot\Drivers\Facebook\Messages\Keyboard\Buttons\CallButton;
-use FondBot\Drivers\Facebook\Messages\Objects\QuickReplies;
-use FondBot\Drivers\Facebook\Messages\QuickReplyMessage;
+use FondBot\Drivers\Facebook\Messages\BasicMessage;
+use FondBot\Drivers\Exceptions\InvalidConfiguration;
 use FondBot\Drivers\Facebook\Templates\ButtonTemplate;
-use FondBot\Drivers\Facebook\Templates\TemplateInterface;
+use FondBot\Drivers\Facebook\Messages\QuickReplyMessage;
+use FondBot\Drivers\Facebook\Messages\Objects\QuickReplies;
+use FondBot\Drivers\Facebook\Messages\Keyboard\Buttons\CallButton;
 
 class SendMessageAdapter implements Content
 {
@@ -56,7 +55,7 @@ class SendMessageAdapter implements Content
 
     private function compileTemplate(Template $template): array
     {
-        if ($template instanceof TemplateInterface) {
+        if ($template instanceof Template) {
             return $template->toArray();
         }
 
@@ -95,7 +94,6 @@ class SendMessageAdapter implements Content
 
         return QuickReplyMessage::create($this->command->text, $replies)->toArray();
     }
-
 
     private function hasCustomButtons(Keyboard $keyboard): bool
     {

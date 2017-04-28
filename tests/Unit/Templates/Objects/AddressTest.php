@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Templates\Objects;
 
-use FondBot\Drivers\Facebook\Templates\Objects\Address;
 use Tests\TestCase;
+use FondBot\Drivers\Facebook\Templates\Objects\Address;
 
 class AddressTest extends TestCase
 {

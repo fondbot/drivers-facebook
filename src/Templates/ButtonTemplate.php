@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace FondBot\Drivers\Facebook\Templates;
 
-class ButtonTemplate implements TemplateInterface
+use FondBot\Conversation\Template;
+
+class ButtonTemplate implements Template
 {
     private $text;
     private $buttons;

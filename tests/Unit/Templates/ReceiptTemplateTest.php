@@ -1,13 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Tests\Unit\Templates;
 
+use Tests\TestCase;
 use FondBot\Drivers\Facebook\Templates\Objects\Address;
-use FondBot\Drivers\Facebook\Templates\Objects\Adjustment;
 use FondBot\Drivers\Facebook\Templates\Objects\Element;
 use FondBot\Drivers\Facebook\Templates\Objects\Summary;
 use FondBot\Drivers\Facebook\Templates\ReceiptTemplate;
-use Tests\TestCase;
+use FondBot\Drivers\Facebook\Templates\Objects\Adjustment;
 
 class ReceiptTemplateTest extends TestCase
 {
@@ -27,12 +29,12 @@ class ReceiptTemplateTest extends TestCase
             $orderNumber = $this->faker()->uuid,
             $recipientName = $this->faker()->firstName,
             $currency = $this->faker()->currencyCode,
-            $paymentMethod = $this->faker()->creditCardType . ' ' . $this->faker()->creditCardNumber,
+            $paymentMethod = $this->faker()->creditCardType.' '.$this->faker()->creditCardNumber,
             $summary
         );
 
         $template->setMerchantName($merchantName = $this->faker()->word);
-        $template->setTimestamp($timestamp = (string)$this->faker()->unixTime);
+        $template->setTimestamp($timestamp = (string) $this->faker()->unixTime);
         $template->setOrderUrl($url = $this->faker()->url);
 
         $this->assertSame($orderNumber, $template->getOrderNumber());

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace FondBot\Drivers\Facebook\Templates\Objects;
 
-use FondBot\Contracts\Arrayable;
 use JsonSerializable;
+use FondBot\Contracts\Arrayable;
 
 class Summary implements Arrayable, JsonSerializable
 {

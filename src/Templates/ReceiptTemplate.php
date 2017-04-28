@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace FondBot\Drivers\Facebook\Templates;
 
+use FondBot\Conversation\Template;
 use FondBot\Drivers\Facebook\Templates\Objects\Address;
-use FondBot\Drivers\Facebook\Templates\Objects\Adjustment;
 use FondBot\Drivers\Facebook\Templates\Objects\Element;
 use FondBot\Drivers\Facebook\Templates\Objects\Summary;
+use FondBot\Drivers\Facebook\Templates\Objects\Adjustment;
 
-class ReceiptTemplate implements TemplateInterface
+class ReceiptTemplate implements Template
 {
     private $orderNumber;
     private $merchantName;

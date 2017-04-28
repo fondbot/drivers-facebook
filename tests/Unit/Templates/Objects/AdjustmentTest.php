@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Tests\Unit\Templates\Objects;
 
-use FondBot\Drivers\Facebook\Templates\Objects\Adjustment;
 use Tests\TestCase;
+use FondBot\Drivers\Facebook\Templates\Objects\Adjustment;
 
 class AdjustmentTest extends TestCase
 {
