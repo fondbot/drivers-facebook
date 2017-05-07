@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace FondBot\Drivers\Facebook\Templates;
 
 use FondBot\Conversation\Template;
+use FondBot\Drivers\Facebook\Templates\Buttons\Button;
 
 class ButtonTemplate implements Template
 {
@@ -40,35 +41,18 @@ class ButtonTemplate implements Template
         return $this->toArray();
     }
 
-    public function addUrlButton(string $url, string $title, array $parameters = []): ButtonTemplate
+    public function addButton(Button $button): ButtonTemplate
     {
-        $this->buttons[] = [
-                'type' => 'web_url',
-                'url' => $url,
-                'title' => $title,
-            ] + $parameters;
+        $this->buttons[] = $button->toArray();
 
         return $this;
     }
 
-    public function addPostBackButton(string $title, string $payload): ButtonTemplate
+    public function setButtons(array $buttons): ButtonTemplate
     {
-        $this->buttons[] = [
-            'type' => 'postback',
-            'title' => $title,
-            'payload' => $payload,
-        ];
-
-        return $this;
-    }
-
-    public function addCallButton(string $title, string $phone): ButtonTemplate
-    {
-        $this->buttons[] = [
-            'type' => 'phone_number',
-            'title' => $title,
-            'payload' => $phone,
-        ];
+        $this->buttons = array_map(function (Button $button) {
+            return $button->toArray();
+        }, $buttons);
 
         return $this;
     }
