@@ -15,7 +15,7 @@
   ],
   "require": {
     "php": ">=7.1",
-    "fondbot/fondbot": "^1.0|1.0.x-dev",
+    "fondbot/framework": "^1.0|1.0.x-dev",
     "guzzlehttp/guzzle": "^6.2"
   },
   "require-dev": {
