@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace FondBot\Drivers\Facebook\Commands;
 
+use FondBot\Templates\Keyboard;
 use FondBot\Conversation\Template;
 use FondBot\Drivers\Commands\SendMessage;
-use FondBot\Drivers\Exceptions\InvalidConfiguration;
-use FondBot\Drivers\Facebook\Messages\BasicMessage;
 use FondBot\Drivers\Facebook\Messages\Content;
-use FondBot\Drivers\Facebook\Messages\Keyboard\Buttons\CallButton;
-use FondBot\Drivers\Facebook\Messages\Objects\QuickReplies;
-use FondBot\Drivers\Facebook\Messages\QuickReplyMessage;
+use FondBot\Drivers\Facebook\Messages\BasicMessage;
+use FondBot\Drivers\Exceptions\InvalidConfiguration;
 use FondBot\Drivers\Facebook\Templates\ButtonTemplate;
 use FondBot\Drivers\Facebook\Templates\ReceiptTemplate;
-use FondBot\Templates\Keyboard;
+use FondBot\Drivers\Facebook\Messages\QuickReplyMessage;
+use FondBot\Drivers\Facebook\Messages\Objects\QuickReplies;
+use FondBot\Drivers\Facebook\Messages\Keyboard\Buttons\CallButton;
 
 class SendMessageAdapter implements Content
 {

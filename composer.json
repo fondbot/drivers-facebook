@@ -15,7 +15,7 @@
   ],
   "require": {
     "php": ">=7.1",
-    "fondbot/framework": "^1.0|1.0.x-dev",
+    "fondbot/framework": "^1.0",
     "guzzlehttp/guzzle": "^6.2"
   },
   "require-dev": {
@@ -42,5 +42,10 @@
     "sort-packages": true
   },
   "minimum-stability": "dev",
-  "prefer-stable": true
+  "prefer-stable": true,
+  "extra": {
+    "branch-alias": {
+      "dev-master": "1.0-dev"
+    }
+  }
 }

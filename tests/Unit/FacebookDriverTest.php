@@ -9,6 +9,7 @@ use GuzzleHttp\Client;
 use FondBot\Helpers\Str;
 use FondBot\Drivers\Chat;
 use FondBot\Drivers\User;
+use FondBot\Http\Request;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
 use FondBot\Drivers\Commands\SendMessage;
@@ -18,38 +19,41 @@ use FondBot\Drivers\Facebook\FacebookReceivedMessage;
 
 /**
  * @property mixed|\Mockery\Mock|\Mockery\MockInterface guzzle
- * @property array $parameters
- * @property FacebookDriver facebook
+ * @property array                                      $parameters
+ * @property FacebookDriver                             facebook
  */
 class FacebookDriverTest extends TestCase
 {
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
         $this->guzzle = $this->mock(Client::class);
         $this->facebook = new FacebookDriverClassTest($this->guzzle);
-        $this->facebook->fill($this->parameters = [
-            'page_token' => Str::random(),
-            'verify_token' => Str::random(),
-            'app_secret' => Str::random(),
-        ]);
+        $this->facebook->fill(
+            $this->parameters = [
+                'page_token' => Str::random(),
+                'verify_token' => Str::random(),
+                'app_secret' => Str::random(),
+            ],
+            new Request([], [])
+        );
     }
 
     /**
      * @expectedException \FondBot\Drivers\Exceptions\InvalidRequest
      * @expectedExceptionMessage Header signature is not provided
      */
-    public function test_verifyRequest_invalid_header()
+    public function test_verifyRequest_invalid_header(): void
     {
         $this->facebook->verifyRequest();
     }
 
-    public function test_verifyRequest_skip_signature()
+    public function test_verifyRequest_skip_signature(): void
     {
-        $data = $this->generateResponse();
+        $request = new Request($data = $this->generateResponse(), $this->generateHeaders($data, Str::random()));
 
-        $this->facebook->fill([], $data, $this->generateHeaders($data, Str::random()));
+        $this->facebook->fill([], $request);
 
         $this->facebook->verifyRequest();
     }
@@ -58,36 +62,19 @@ class FacebookDriverTest extends TestCase
      * @expectedException \FondBot\Drivers\Exceptions\InvalidRequest
      * @expectedExceptionMessage Invalid signature header
      */
-    public function test_verifyRequest_invalid_secret()
+    public function test_verifyRequest_invalid_secret(): void
     {
-        $data = [
-            'foo' => 'bar',
-        ];
+        $request = new Request($data = ['foo' => 'bar'], $this->generateHeaders($data, Str::random()));
 
-        $this->facebook->fill($this->parameters, $data, $this->generateHeaders($data, Str::random()));
+        $this->facebook->fill($this->parameters, $request);
 
         $this->facebook->verifyRequest();
     }
 
-    public function test_verifyRequest_valid_header()
+    public function test_verifyRequest_valid_header(): void
     {
-        $this->facebook->fill([], $data = $this->generateResponse(),
-            $this->generateHeaders($data, $this->parameters['app_secret']));
-
-        $this->facebook->verifyRequest();
-    }
-
-    /**
-     * @expectedException \FondBot\Drivers\Exceptions\InvalidRequest
-     * @expectedExceptionMessage Invalid payload
-     */
-    public function test_verifyRequest_empty_message()
-    {
-        $data = [
-            'foo' => 'bar',
-        ];
-
-        $this->facebook->fill($this->parameters, $data, $this->generateHeaders($data, $this->parameters['app_secret']));
+        $request = new Request($data = $this->generateResponse(), $this->generateHeaders($data, $this->parameters['app_secret']));
+        $this->facebook->fill([], $request);
 
         $this->facebook->verifyRequest();
     }
@@ -96,7 +83,20 @@ class FacebookDriverTest extends TestCase
      * @expectedException \FondBot\Drivers\Exceptions\InvalidRequest
      * @expectedExceptionMessage Invalid payload
      */
-    public function test_verifyRequest_empty_message_from()
+    public function test_verifyRequest_empty_message(): void
+    {
+        $request = new Request($data = ['foo' => 'bar'], $this->generateHeaders($data, $this->parameters['app_secret']));
+
+        $this->facebook->fill($this->parameters, $request);
+
+        $this->facebook->verifyRequest();
+    }
+
+    /**
+     * @expectedException \FondBot\Drivers\Exceptions\InvalidRequest
+     * @expectedExceptionMessage Invalid payload
+     */
+    public function test_verifyRequest_empty_message_from(): void
     {
         $data = [
             'entry' => [
@@ -112,21 +112,23 @@ class FacebookDriverTest extends TestCase
             ],
         ];
 
-        $this->facebook->fill($this->parameters, $data, $this->generateHeaders($data, $this->parameters['app_secret']));
+        $request = new Request($data, $this->generateHeaders($data, $this->parameters['app_secret']));
+
+        $this->facebook->fill($this->parameters, $request);
 
         $this->facebook->verifyRequest();
     }
 
-    public function test_verifyRequest()
+    public function test_verifyRequest(): void
     {
-        $data = $this->generateResponse();
+        $request = new Request($data = $this->generateResponse(), $this->generateHeaders($data, $this->parameters['app_secret']));
 
-        $this->facebook->fill($this->parameters, $data, $this->generateHeaders($data, $this->parameters['app_secret']));
+        $this->facebook->fill($this->parameters, $request);
 
         $this->facebook->verifyRequest();
     }
 
-    public function test_getSender()
+    public function test_getSender(): void
     {
         $senderId = $this->faker()->uuid;
         $response = [
@@ -139,7 +141,9 @@ class FacebookDriverTest extends TestCase
             'gender' => $this->faker()->word,
         ];
 
-        $this->facebook->fill($this->parameters, $this->generateResponse($senderId));
+        $request = new Request($this->generateResponse($senderId), []);
+
+        $this->facebook->fill($this->parameters, $request);
 
         $stream = $this->mock(ResponseInterface::class);
 
@@ -167,11 +171,12 @@ class FacebookDriverTest extends TestCase
      * @expectedException \FondBot\Drivers\Exceptions\InvalidRequest
      * @expectedExceptionMessage Can not get user profile
      */
-    public function test_getSender_exception()
+    public function test_getSender_exception(): void
     {
         $senderId = $this->faker()->uuid;
+        $request = new Request($this->generateResponse($senderId), []);
 
-        $this->facebook->fill($this->parameters, $this->generateResponse($senderId));
+        $this->facebook->fill($this->parameters, $request);
 
         $this->guzzle->shouldReceive('get')
             ->with('https://graph.facebook.com/v2.6/'.$senderId, [
@@ -185,9 +190,10 @@ class FacebookDriverTest extends TestCase
         $this->assertInstanceOf(User::class, $result);
     }
 
-    public function test_getMessage()
+    public function test_getMessage(): void
     {
-        $this->facebook->fill($this->parameters, $this->generateResponse(null, $text = $this->faker()->text()));
+        $request = new Request($this->generateResponse(null, $text = $this->faker()->text()), []);
+        $this->facebook->fill($this->parameters, $request);
 
         $message = $this->facebook->getMessage();
         $this->assertInstanceOf(FacebookReceivedMessage::class, $message);
@@ -196,11 +202,12 @@ class FacebookDriverTest extends TestCase
         $this->assertNull($message->getLocation());
     }
 
-    public function test_getChat()
+    public function test_getChat(): void
     {
         $id = $this->faker()->uuid;
+        $request = new Request($this->generateResponse($id), []);
 
-        $this->facebook->fill($this->parameters, $this->generateResponse($id));
+        $this->facebook->fill($this->parameters, $request);
 
         $chat = $this->facebook->getChat();
 
@@ -210,13 +217,15 @@ class FacebookDriverTest extends TestCase
         $this->assertSame('', $chat->getTitle());
     }
 
-    public function test_verify_webhook_check()
+    public function test_verify_webhook_check(): void
     {
-        $this->facebook->fill($this->parameters, [
+        $request = new Request([
             'hub_mode' => 'subscribe',
             'hub_verify_token' => $this->parameters['verify_token'],
             'hub_challenge' => $challenge = $this->faker()->randomNumber(),
-        ]);
+        ], []);
+
+        $this->facebook->fill($this->parameters, $request);
 
         $this->assertTrue($this->facebook->isVerificationRequest());
         $this->assertEquals($challenge, $this->facebook->verifyWebhook());
@@ -226,19 +235,20 @@ class FacebookDriverTest extends TestCase
      * @expectedException \FondBot\Drivers\Exceptions\InvalidRequest
      * @expectedExceptionMessage Invalid verify token
      */
-    public function test_verifyWebhook_invalid_token()
+    public function test_verifyWebhook_invalid_token(): void
     {
-        $this->facebook->fill($this->parameters, [
+        $request = new Request([
             'hub_mode' => 'subscribe',
             'hub_verify_token' => $this->faker()->word,
             'hub_challenge' => $challenge = $this->faker()->randomNumber(),
-        ]);
+        ], []);
+        $this->facebook->fill($this->parameters, $request);
 
         $this->assertTrue($this->facebook->isVerificationRequest());
         $this->facebook->verifyWebhook();
     }
 
-    public function test_handle()
+    public function test_handle(): void
     {
         $id = $this->faker()->uuid;
         $text = $this->faker()->word;
@@ -266,61 +276,6 @@ class FacebookDriverTest extends TestCase
                         [
                             'sender' => ['id' => $id ?: $this->faker()->uuid],
                             'message' => ['text' => $text ?: $this->faker()->word],
-                        ],
-                    ],
-                ],
-            ],
-        ];
-    }
-
-    private function generateLocationResponse(float $latitude, float $longitude): array
-    {
-        return [
-            'entry' => [
-                [
-                    'messaging' => [
-                        [
-                            'sender' => [$this->faker()->uuid],
-                            'message' => [
-                                'attachments' => [
-                                    [
-                                        'title' => $this->faker()->sentence,
-                                        'url' => $this->faker()->url,
-                                        'type' => 'location',
-                                        'payload' => [
-                                            'coordinates' => [
-                                                'lat' => $latitude ?: $this->faker()->latitude,
-                                                'long' => $longitude ?: $this->faker()->longitude,
-                                            ],
-                                        ],
-                                    ],
-                                ],
-                            ],
-                        ],
-                    ],
-                ],
-            ],
-        ];
-    }
-
-    private function generateAttachmentResponse(string $type)
-    {
-        return [
-            'entry' => [
-                [
-                    'messaging' => [
-                        [
-                            'sender' => [$this->faker()->uuid],
-                            'message' => [
-                                'attachments' => [
-                                    [
-                                        'type' => $type,
-                                        'payload' => [
-                                            'url' => $this->faker()->url,
-                                        ],
-                                    ],
-                                ],
-                            ],
                         ],
                     ],
                 ],

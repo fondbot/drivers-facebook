@@ -10,7 +10,6 @@ use FondBot\Drivers\User;
 use FondBot\Drivers\Driver;
 use FondBot\Drivers\Command;
 use FondBot\Drivers\ReceivedMessage;
-use FondBot\Queue\SerializesForQueue;
 use FondBot\Drivers\Commands\SendMessage;
 use GuzzleHttp\Exception\RequestException;
 use FondBot\Drivers\Commands\SendAttachment;
@@ -22,8 +21,6 @@ use FondBot\Drivers\Facebook\Commands\SendAttachmentAdapter;
 
 class FacebookDriver extends Driver implements WebhookVerification
 {
-    use SerializesForQueue;
-
     protected const API_URL = 'https://graph.facebook.com/v2.6/';
 
     protected $guzzle;
@@ -40,7 +37,7 @@ class FacebookDriver extends Driver implements WebhookVerification
     {
         $this->verifySignature();
 
-        if (!$this->hasRequest('entry.0.messaging.0.sender.id') || !$this->hasRequest('entry.0.messaging.0.message')) {
+        if (!$this->request->hasParameters(['entry.0.messaging.0.sender.id', 'entry.0.messaging.0.message'])) {
             throw new InvalidRequest('Invalid payload');
         }
     }
@@ -56,7 +53,7 @@ class FacebookDriver extends Driver implements WebhookVerification
             return $this->sender;
         }
 
-        $id = $this->getRequest('entry.0.messaging.0.sender.id');
+        $id = $this->request->getParameter('entry.0.messaging.0.sender.id');
 
         try {
             $response = $this->getGuzzle()->get(self::API_URL.$id, $this->getDefaultRequestParameters());
@@ -79,7 +76,7 @@ class FacebookDriver extends Driver implements WebhookVerification
      */
     public function getMessage(): ReceivedMessage
     {
-        return new FacebookReceivedMessage($this->getRequest('entry.0.messaging.0.message'));
+        return new FacebookReceivedMessage($this->request->getParameter('entry.0.messaging.0.message'));
     }
 
     /**
@@ -89,7 +86,7 @@ class FacebookDriver extends Driver implements WebhookVerification
      */
     public function isVerificationRequest(): bool
     {
-        return $this->getRequest('hub_mode') === 'subscribe' && $this->hasRequest('hub_verify_token');
+        return $this->request->getParameter('hub_mode') === 'subscribe' && $this->request->getParameter('hub_verify_token');
     }
 
     /**
@@ -99,8 +96,8 @@ class FacebookDriver extends Driver implements WebhookVerification
      */
     public function verifyWebhook()
     {
-        if ($this->getRequest('hub_verify_token') === $this->getParameter('verify_token')) {
-            return $this->getRequest('hub_challenge');
+        if ($this->request->getParameter('hub_verify_token') === $this->getParameter('verify_token')) {
+            return $this->request->getParameter('hub_challenge');
         }
 
         throw new InvalidRequest('Invalid verify token');
@@ -122,11 +119,11 @@ class FacebookDriver extends Driver implements WebhookVerification
             return;
         }
 
-        if (!$header = $this->getHeader('x-hub-signature')[0] ?? null) {
+        if (!$header = $this->request->getHeader('x-hub-signature')[0] ?? null) {
             throw new InvalidRequest('Header signature is not provided');
         }
 
-        if (!hash_equals($header, 'sha1='.hash_hmac('sha1', json_encode($this->getRequest()), $secret))) {
+        if (!hash_equals($header, 'sha1='.hash_hmac('sha1', json_encode($this->request->getParameters()), $secret))) {
             throw new InvalidRequest('Invalid signature header');
         }
     }
@@ -166,7 +163,7 @@ class FacebookDriver extends Driver implements WebhookVerification
      */
     public function getChat(): Chat
     {
-        $id = $this->getRequest('entry.0.messaging.0.sender.id');
+        $id = $this->request->getParameter('entry.0.messaging.0.sender.id');
 
         return new Chat($id, '');
     }
