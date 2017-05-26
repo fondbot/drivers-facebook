@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace FondBot\Drivers\Facebook\Templates\Objects;
 
-use JsonSerializable;
 use FondBot\Contracts\Arrayable;
+use JsonSerializable;
 
 class Address implements Arrayable, JsonSerializable
 {
@@ -15,25 +15,6 @@ class Address implements Arrayable, JsonSerializable
     private $postalCode;
     private $state;
     private $country;
-
-    public function __construct(string $street, string $city, string $postalCode, string $state, string $country)
-    {
-        $this->street = $street;
-        $this->city = $city;
-        $this->postalCode = $postalCode;
-        $this->state = $state;
-        $this->country = $country;
-    }
-
-    public static function create(
-        string $street,
-        string $city,
-        string $postalCode,
-        string $state,
-        string $country
-    ): Address {
-        return new static($street, $city, $postalCode, $state, $country);
-    }
 
     public function toArray(): array
     {
@@ -52,16 +33,6 @@ class Address implements Arrayable, JsonSerializable
         return $this->toArray();
     }
 
-    public function getStreet(): string
-    {
-        return $this->street;
-    }
-
-    public function getSecondaryStreet(): ?string
-    {
-        return $this->secondaryStreet;
-    }
-
     public function setSecondaryStreet(string $secondaryStreet): Address
     {
         $this->secondaryStreet = $secondaryStreet;
@@ -69,23 +40,38 @@ class Address implements Arrayable, JsonSerializable
         return $this;
     }
 
-    public function getCity(): string
+    public function setStreet(string $street): Address
     {
-        return $this->city;
+        $this->street = $street;
+
+        return $this;
     }
 
-    public function getPostalCode(): string
+    public function setCity(string $city): Address
     {
-        return $this->postalCode;
+        $this->city = $city;
+
+        return $this;
     }
 
-    public function getState(): string
+    public function setPostalCode(string $postalCode): Address
     {
-        return $this->state;
+        $this->postalCode = $postalCode;
+
+        return $this;
     }
 
-    public function getCountry(): string
+    public function setState(string $state): Address
     {
-        return $this->country;
+        $this->state = $state;
+
+        return $this;
+    }
+
+    public function setCountry(string $country): Address
+    {
+        $this->country = $country;
+
+        return $this;
     }
 }

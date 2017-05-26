@@ -11,16 +11,6 @@ class ButtonTemplate implements Template
     private $text;
     private $buttons;
 
-    public function __construct(string $text)
-    {
-        $this->text = $text;
-    }
-
-    public static function create(string $text): ButtonTemplate
-    {
-        return new static($text);
-    }
-
     public function toArray(): array
     {
         return [
@@ -69,6 +59,13 @@ class ButtonTemplate implements Template
             'title' => $title,
             'payload' => $phone,
         ];
+
+        return $this;
+    }
+
+    public function setText(string $text): ButtonTemplate
+    {
+        $this->text = $text;
 
         return $this;
     }

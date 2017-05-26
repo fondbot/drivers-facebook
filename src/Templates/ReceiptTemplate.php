@@ -6,9 +6,9 @@ namespace FondBot\Drivers\Facebook\Templates;
 
 use FondBot\Conversation\Template;
 use FondBot\Drivers\Facebook\Templates\Objects\Address;
+use FondBot\Drivers\Facebook\Templates\Objects\Adjustment;
 use FondBot\Drivers\Facebook\Templates\Objects\Element;
 use FondBot\Drivers\Facebook\Templates\Objects\Summary;
-use FondBot\Drivers\Facebook\Templates\Objects\Adjustment;
 
 class ReceiptTemplate implements Template
 {
@@ -23,30 +23,6 @@ class ReceiptTemplate implements Template
     private $address;
     private $summary;
     private $adjustments;
-
-    public function __construct(
-        string $orderNumber,
-        string $recipientName,
-        string $currency,
-        string $paymentMethod,
-        Summary $summary
-    ) {
-        $this->orderNumber = $orderNumber;
-        $this->recipientName = $recipientName;
-        $this->currency = $currency;
-        $this->paymentMethod = $paymentMethod;
-        $this->summary = $summary->toArray();
-    }
-
-    public static function create(
-        string $orderNumber,
-        string $recipientName,
-        string $currency,
-        string $paymentMethod,
-        Summary $summary
-    ): ReceiptTemplate {
-        return new static($orderNumber, $recipientName, $currency, $paymentMethod, $summary);
-    }
 
     public function toArray(): array
     {
@@ -76,41 +52,11 @@ class ReceiptTemplate implements Template
         return $this->toArray();
     }
 
-    public function getOrderNumber(): string
-    {
-        return $this->orderNumber;
-    }
-
-    public function getMerchantName(): ?string
-    {
-        return $this->merchantName;
-    }
-
     public function setMerchantName(string $merchantName): ReceiptTemplate
     {
         $this->merchantName = $merchantName;
 
         return $this;
-    }
-
-    public function getRecipientName(): string
-    {
-        return $this->recipientName;
-    }
-
-    public function getCurrency(): string
-    {
-        return $this->currency;
-    }
-
-    public function getPaymentMethod(): string
-    {
-        return $this->paymentMethod;
-    }
-
-    public function getTimestamp(): ?string
-    {
-        return $this->timestamp;
     }
 
     public function setTimestamp(string $timestamp): ReceiptTemplate
@@ -120,24 +66,11 @@ class ReceiptTemplate implements Template
         return $this;
     }
 
-    public function getOrderUrl(): ?string
-    {
-        return $this->orderUrl;
-    }
-
     public function setOrderUrl(string $orderUrl): ReceiptTemplate
     {
         $this->orderUrl = $orderUrl;
 
         return $this;
-    }
-
-    /**
-     * @return array|null|Element[]
-     */
-    public function getElements(): ?array
-    {
-        return $this->elements;
     }
 
     public function addElement(Element $element)
@@ -147,9 +80,13 @@ class ReceiptTemplate implements Template
         return $this;
     }
 
-    public function getAddress(): ?array
+    public function setElements(array $elements): ReceiptTemplate
     {
-        return $this->address;
+        $this->elements = array_map(function (Element $element) {
+            return $element->toArray();
+        }, $elements);
+
+        return $this;
     }
 
     public function setAddress(Address $address): ReceiptTemplate
@@ -159,22 +96,53 @@ class ReceiptTemplate implements Template
         return $this;
     }
 
-    public function getSummary(): array
-    {
-        return $this->summary;
-    }
-
-    /**
-     * @return array|null|Adjustment[]
-     */
-    public function getAdjustments(): ?array
-    {
-        return $this->adjustments;
-    }
-
     public function addAdjustment(Adjustment $adjustment): ReceiptTemplate
     {
         $this->adjustments[] = $adjustment->toArray();
+
+        return $this;
+    }
+
+    public function setAdjustments(array $adjustments): ReceiptTemplate
+    {
+        $this->adjustments = array_map(function (Adjustment $adjustment) {
+            return $adjustment->toArray();
+        }, $adjustments);
+
+        return $this;
+    }
+
+    public function setOrderNumber(string $orderNumber): ReceiptTemplate
+    {
+        $this->orderNumber = $orderNumber;
+
+        return $this;
+    }
+
+    public function setRecipientName(string $recipientName): ReceiptTemplate
+    {
+        $this->recipientName = $recipientName;
+
+        return $this;
+    }
+
+    public function setCurrency(string $currency): ReceiptTemplate
+    {
+        $this->currency = $currency;
+
+        return $this;
+    }
+
+    public function setPaymentMethod(string $paymentMethod): ReceiptTemplate
+    {
+        $this->paymentMethod = $paymentMethod;
+
+        return $this;
+    }
+
+    public function setSummary(Summary $summary): ReceiptTemplate
+    {
+        $this->summary = $summary->toArray();
 
         return $this;
     }
