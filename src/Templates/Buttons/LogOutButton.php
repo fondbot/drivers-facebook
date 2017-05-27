@@ -13,11 +13,6 @@ namespace FondBot\Drivers\Facebook\Templates\Buttons;
  */
 class LogOutButton implements Button
 {
-    public static function create()
-    {
-        return new static;
-    }
-
     public function toArray(): array
     {
         return [

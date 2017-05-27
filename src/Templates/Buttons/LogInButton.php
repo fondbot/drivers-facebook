@@ -15,21 +15,18 @@ class LogInButton implements Button
 {
     private $url;
 
-    public function __construct(string $url)
-    {
-        $this->url = $url;
-    }
-
-    public static function create(string $url): LogInButton
-    {
-        return new static($url);
-    }
-
     public function toArray(): array
     {
         return [
             'type' => 'account_link',
             'url' => $this->url,
         ];
+    }
+
+    public function setUrl(string $url): LogInButton
+    {
+        $this->url = $url;
+
+        return $this;
     }
 }

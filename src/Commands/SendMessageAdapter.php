@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace FondBot\Drivers\Facebook\Commands;
 
-use FondBot\Conversation\Template;
+use FondBot\Contracts\Template;
 use FondBot\Drivers\Commands\SendMessage;
 use FondBot\Drivers\Exceptions\InvalidConfiguration;
 use FondBot\Drivers\Facebook\Messages\BasicMessage;
@@ -12,7 +12,10 @@ use FondBot\Drivers\Facebook\Messages\Content;
 use FondBot\Drivers\Facebook\Messages\Keyboard\Buttons\CallButton;
 use FondBot\Drivers\Facebook\Messages\Objects\QuickReplies;
 use FondBot\Drivers\Facebook\Messages\QuickReplyMessage;
+use FondBot\Drivers\Facebook\Templates\Buttons\PostBackButton;
+use FondBot\Drivers\Facebook\Templates\Buttons\UrlButton;
 use FondBot\Drivers\Facebook\Templates\ButtonTemplate;
+use FondBot\Drivers\Facebook\Templates\ListTemplate;
 use FondBot\Drivers\Facebook\Templates\ReceiptTemplate;
 use FondBot\Templates\Keyboard;
 
@@ -56,7 +59,10 @@ class SendMessageAdapter implements Content
 
     private function compileTemplate(Template $template): array
     {
-        if ($template instanceof ReceiptTemplate || $template instanceof ButtonTemplate) {
+        if ($template instanceof ReceiptTemplate
+            || $template instanceof ButtonTemplate
+            || $template instanceof ListTemplate
+        ) {
             return $template->toArray();
         }
 
@@ -74,13 +80,23 @@ class SendMessageAdapter implements Content
 
             foreach ($keyboard->getButtons() as $button) {
                 if ($button instanceof Keyboard\UrlButton) {
-                    $template->addUrlButton($button->getUrl(), $button->getLabel(), $button->getParameters());
+                    $template->addButton(
+                        (new UrlButton)
+                            ->setUrl($button->getUrl())
+                            ->setTitle($button->getLabel())
+                    );
                 } elseif ($button instanceof Keyboard\PayloadButton) {
-                    $template->addPostBackButton($button->getLabel(), $button->getPayload());
+                    $template->addButton(
+                        (new PostBackButton)
+                            ->setTitle($button->getLabel())
+                            ->setPayload($button->getPayload())
+                    );
                 } elseif ($button instanceof CallButton) {
-                    $template->addCallButton($button->getLabel(), $button->getPhone());
-                } else {
-                    $template->addPostBackButton($button->getLabel(), $button->getLabel());
+                    $template->addButton(
+                        (new \FondBot\Drivers\Facebook\Templates\Buttons\CallButton)
+                            ->setTitle($button->getLabel())
+                            ->setPhone($button->getPhone())
+                    );
                 }
             }
 

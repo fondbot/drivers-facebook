@@ -19,31 +19,10 @@ class UrlButton implements Button
 
     private $title;
     private $url;
-    private $webViewHeightRatio;
+    private $webViewHeightRatio = self::WEB_VIEW_COMPACT;
     private $messengerExtensions;
     private $fallbackUrl;
     private $webViewShareButton;
-
-    /**
-     * UrlButton constructor.
-     *
-     *
-     *
-     * @param string $title
-     * @param string $url
-     */
-    public function __construct(string $title, string $url)
-    {
-        $this->title = $title;
-        $this->url = $url;
-
-        $this->setWebViewCompact();
-    }
-
-    public static function create(string $title, string $url): UrlButton
-    {
-        return new static($title, $url);
-    }
 
     public function toArray(): array
     {
@@ -96,6 +75,20 @@ class UrlButton implements Button
     public function setWebViewShareButton(string $value = 'hide'): UrlButton
     {
         $this->webViewShareButton = $value;
+
+        return $this;
+    }
+
+    public function setTitle(string $title): UrlButton
+    {
+        $this->title = $title;
+
+        return $this;
+    }
+
+    public function setUrl(string $url): UrlButton
+    {
+        $this->url = $url;
 
         return $this;
     }

@@ -16,17 +16,6 @@ class CallButton implements Button
     private $title;
     private $phone;
 
-    public function __construct(string $title, string $phone)
-    {
-        $this->title = $title;
-        $this->phone = $phone;
-    }
-
-    public static function create(string $title, string $phone): CallButton
-    {
-        return new static($title, $phone);
-    }
-
     public function toArray(): array
     {
         return [
@@ -34,5 +23,19 @@ class CallButton implements Button
             'title' => $this->title,
             'payload' => $this->phone,
         ];
+    }
+
+    public function setTitle(string $title): CallButton
+    {
+        $this->title = $title;
+
+        return $this;
+    }
+
+    public function setPhone(string $phone): CallButton
+    {
+        $this->phone = $phone;
+
+        return $this;
     }
 }

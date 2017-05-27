@@ -7,7 +7,7 @@ namespace FondBot\Drivers\Facebook\Templates\Objects;
 use FondBot\Contracts\Arrayable;
 use JsonSerializable;
 
-class Element implements Arrayable, JsonSerializable
+class OrderElement implements Arrayable, JsonSerializable
 {
     private $title;
     private $subtitle;
@@ -33,42 +33,42 @@ class Element implements Arrayable, JsonSerializable
         return $this->toArray();
     }
 
-    public function setSubtitle(string $subtitle): Element
+    public function setSubtitle(string $subtitle): OrderElement
     {
         $this->subtitle = $subtitle;
 
         return $this;
     }
 
-    public function setQuantity(int $quantity): Element
+    public function setQuantity(int $quantity): OrderElement
     {
         $this->quantity = $quantity;
 
         return $this;
     }
 
-    public function setCurrency(string $currency): Element
+    public function setCurrency(string $currency): OrderElement
     {
         $this->currency = $currency;
 
         return $this;
     }
 
-    public function setImageUrl(string $imageUrl): Element
+    public function setImageUrl(string $imageUrl): OrderElement
     {
         $this->imageUrl = $imageUrl;
 
         return $this;
     }
 
-    public function setTitle(string $title): Element
+    public function setTitle(string $title): OrderElement
     {
         $this->title = $title;
 
         return $this;
     }
 
-    public function setPrice(float $price): Element
+    public function setPrice(float $price): OrderElement
     {
         $this->price = $price;
 

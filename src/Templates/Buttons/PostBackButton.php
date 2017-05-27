@@ -16,17 +16,6 @@ class PostBackButton implements Button
     private $title;
     private $payload;
 
-    public function __construct(string $title, string $payload)
-    {
-        $this->title = $title;
-        $this->payload = $payload;
-    }
-
-    public static function create(string $title, string $payload): PostBackButton
-    {
-        return new static($title, $payload);
-    }
-
     public function toArray(): array
     {
         return [
@@ -34,5 +23,19 @@ class PostBackButton implements Button
             'title' => $this->title,
             'payload' => $this->payload,
         ];
+    }
+
+    public function setTitle(string $title): PostBackButton
+    {
+        $this->title = $title;
+
+        return $this;
+    }
+
+    public function setPayload(string $payload): PostBackButton
+    {
+        $this->payload = $payload;
+
+        return $this;
     }
 }

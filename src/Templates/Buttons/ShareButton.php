@@ -13,11 +13,6 @@ namespace FondBot\Drivers\Facebook\Templates\Buttons;
  */
 class ShareButton implements Button
 {
-    public static function create(): ShareButton
-    {
-        return new static;
-    }
-
     public function toArray(): array
     {
         return [

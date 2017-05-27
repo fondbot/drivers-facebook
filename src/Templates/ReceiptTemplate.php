@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace FondBot\Drivers\Facebook\Templates;
 
-use FondBot\Conversation\Template;
+use FondBot\Contracts\Template;
 use FondBot\Drivers\Facebook\Templates\Objects\Address;
 use FondBot\Drivers\Facebook\Templates\Objects\Adjustment;
-use FondBot\Drivers\Facebook\Templates\Objects\Element;
+use FondBot\Drivers\Facebook\Templates\Objects\OrderElement;
 use FondBot\Drivers\Facebook\Templates\Objects\Summary;
 
 class ReceiptTemplate implements Template
@@ -73,16 +73,16 @@ class ReceiptTemplate implements Template
         return $this;
     }
 
-    public function addElement(Element $element)
+    public function addOrderElement(OrderElement $element)
     {
         $this->elements[] = $element->toArray();
 
         return $this;
     }
 
-    public function setElements(array $elements): ReceiptTemplate
+    public function setOrderElements(array $elements): ReceiptTemplate
     {
-        $this->elements = array_map(function (Element $element) {
+        $this->elements = array_map(function (OrderElement $element) {
             return $element->toArray();
         }, $elements);
 

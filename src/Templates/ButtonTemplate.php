@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace FondBot\Drivers\Facebook\Templates;
 
-use FondBot\Conversation\Template;
+use FondBot\Contracts\Template;
 use FondBot\Drivers\Facebook\Templates\Buttons\Button;
 
 class ButtonTemplate implements Template
