@@ -4,38 +4,51 @@ declare(strict_types=1);
 
 namespace FondBot\Drivers\Facebook\Templates\Buttons;
 
+use FondBot\Contracts\Arrayable;
+use FondBot\Templates\Keyboard\Button;
+
 /**
- * Class CallButton
- *
  * @see https://developers.facebook.com/docs/messenger-platform/send-api-reference/call-button
- *
- * @package FondBot\Drivers\Facebook\Templates\Buttons
  */
-class CallButton implements Button
+class CallButton extends Button implements Arrayable
 {
-    private $title;
     private $phone;
 
-    public function toArray(): array
+    /**
+     * Get name.
+     *
+     * @return string
+     */
+    public function getName(): string
     {
-        return [
-            'type' => 'phone_number',
-            'title' => $this->title,
-            'payload' => $this->phone,
-        ];
+        return 'CallButton';
     }
 
-    public function setTitle(string $title): CallButton
-    {
-        $this->title = $title;
-
-        return $this;
-    }
-
+    /**
+     * Set phone.
+     *
+     * @param string $phone
+     *
+     * @return CallButton
+     */
     public function setPhone(string $phone): CallButton
     {
         $this->phone = $phone;
 
         return $this;
+    }
+
+    /**
+     * Get the instance as an array.
+     *
+     * @return array
+     */
+    public function toArray(): array
+    {
+        return [
+            'type' => 'phone_number',
+            'title' => $this->label,
+            'payload' => $this->phone,
+        ];
     }
 }

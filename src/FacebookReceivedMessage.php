@@ -36,10 +36,9 @@ class FacebookReceivedMessage implements ReceivedMessage
     public function getLocation(): ?Location
     {
         if ($location = $this->getAttachmentPayload('location')) {
-            return new Location(
-                $location['coordinates']['lat'],
-                $location['coordinates']['long']
-            );
+            return (new Location)
+                ->setLatitude($location['coordinates']['lat'])
+                ->setLongitude($location['coordinates']['long']);
         }
 
         return null;
@@ -98,7 +97,9 @@ class FacebookReceivedMessage implements ReceivedMessage
     protected function getImage(): ?Attachment
     {
         if ($image = $this->getAttachmentPayload('image')) {
-            return new Attachment(Attachment::TYPE_IMAGE, $image['url']);
+            return (new Attachment)
+                ->setType(Attachment::TYPE_IMAGE)
+                ->setPath($image['url']);
         }
 
         return null;
@@ -112,7 +113,9 @@ class FacebookReceivedMessage implements ReceivedMessage
     protected function getAudio(): ?Attachment
     {
         if ($audio = $this->getAttachmentPayload('audio')) {
-            return new Attachment(Attachment::TYPE_AUDIO, $audio['url']);
+            return (new Attachment)
+                ->setType(Attachment::TYPE_AUDIO)
+                ->setPath($audio['url']);
         }
 
         return null;
@@ -126,7 +129,9 @@ class FacebookReceivedMessage implements ReceivedMessage
     protected function getVideo(): ?Attachment
     {
         if ($video = $this->getAttachmentPayload('video')) {
-            return new Attachment(Attachment::TYPE_VIDEO, $video['url']);
+            return (new Attachment)
+                ->setType(Attachment::TYPE_VIDEO)
+                ->setPath($video['url']);
         }
 
         return null;
@@ -140,7 +145,9 @@ class FacebookReceivedMessage implements ReceivedMessage
     protected function getFile(): ?Attachment
     {
         if ($file = $this->getAttachmentPayload('file')) {
-            return new Attachment(Attachment::TYPE_FILE, $file['url']);
+            return (new Attachment)
+                ->setType(Attachment::TYPE_FILE)
+                ->setPath($file['url']);
         }
 
         return null;

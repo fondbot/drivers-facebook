@@ -4,15 +4,29 @@ declare(strict_types=1);
 
 namespace FondBot\Drivers\Facebook\Templates\Buttons;
 
+use FondBot\Contracts\Arrayable;
+use FondBot\Templates\Keyboard\Button;
+
 /**
- * Class LogOutButton
- *
  * @see https://developers.facebook.com/docs/messenger-platform/account-linking/unlink-account
- *
- * @package FondBot\Drivers\Facebook\Templates\Buttons
  */
-class LogOutButton implements Button
+class LogOutButton extends Button implements Arrayable
 {
+    /**
+     * Get name.
+     *
+     * @return string
+     */
+    public function getName(): string
+    {
+        return 'LogOutButton';
+    }
+
+    /**
+     * Get the instance as an array.
+     *
+     * @return array
+     */
     public function toArray(): array
     {
         return [

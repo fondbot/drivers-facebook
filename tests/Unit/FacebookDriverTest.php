@@ -29,7 +29,7 @@ class FacebookDriverTest extends TestCase
         parent::setUp();
 
         $this->guzzle = $this->mock(Client::class);
-        $this->facebook = new FacebookDriverClassTest($this->guzzle);
+        $this->facebook = new FacebookDriver($this->guzzle);
         $this->facebook->fill(
             $this->parameters = [
                 'page_token' => Str::random(),
@@ -288,13 +288,5 @@ class FacebookDriverTest extends TestCase
         return [
             'x-hub-signature' => [$this->generateSignature($data, $key)],
         ];
-    }
-}
-
-class FacebookDriverClassTest extends FacebookDriver
-{
-    public function __construct(Client $guzzle)
-    {
-        $this->guzzle = $guzzle;
     }
 }

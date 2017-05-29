@@ -4,29 +4,42 @@ declare(strict_types=1);
 
 namespace FondBot\Drivers\Facebook;
 
-use GuzzleHttp\Client;
 use FondBot\Drivers\Chat;
 use FondBot\Drivers\User;
 use FondBot\Drivers\Driver;
-use FondBot\Drivers\Command;
+use FondBot\Drivers\CommandHandler;
 use FondBot\Drivers\ReceivedMessage;
-use FondBot\Drivers\Commands\SendMessage;
+use FondBot\Drivers\TemplateCompiler;
 use GuzzleHttp\Exception\RequestException;
-use FondBot\Drivers\Commands\SendAttachment;
 use FondBot\Drivers\Exceptions\InvalidRequest;
 use FondBot\Drivers\Extensions\WebhookVerification;
-use FondBot\Drivers\Exceptions\InvalidConfiguration;
-use FondBot\Drivers\Facebook\Commands\SendMessageAdapter;
-use FondBot\Drivers\Facebook\Commands\SendAttachmentAdapter;
 
 class FacebookDriver extends Driver implements WebhookVerification
 {
-    protected const API_URL = 'https://graph.facebook.com/v2.6/';
-
-    protected $guzzle;
+    public const API_URL = 'https://graph.facebook.com/v2.6/';
 
     /** @var User|null */
-    protected $sender;
+    private $sender;
+
+    /**
+     * Get template compiler instance.
+     *
+     * @return TemplateCompiler|null
+     */
+    public function getTemplateCompiler(): ?TemplateCompiler
+    {
+        return new FacebookTemplateCompiler;
+    }
+
+    /**
+     * Get command handler instance.
+     *
+     * @return CommandHandler
+     */
+    public function getCommandHandler(): CommandHandler
+    {
+        return new FacebookCommandHandler($this);
+    }
 
     /**
      * Verify incoming request data.
@@ -40,43 +53,6 @@ class FacebookDriver extends Driver implements WebhookVerification
         if (!$this->request->hasParameters(['entry.0.messaging.0.sender.id', 'entry.0.messaging.0.message'])) {
             throw new InvalidRequest('Invalid payload');
         }
-    }
-
-    /**
-     * Get message sender.
-     * @return User
-     * @throws InvalidRequest
-     */
-    public function getUser(): User
-    {
-        if ($this->sender !== null) {
-            return $this->sender;
-        }
-
-        $id = $this->request->getParameter('entry.0.messaging.0.sender.id');
-
-        try {
-            $response = $this->getGuzzle()->get(self::API_URL.$id, $this->getDefaultRequestParameters());
-            $user = json_decode((string) $response->getBody(), true);
-            $user['id'] = (string) $id;
-
-            return $this->sender = new User(
-                $user['id'],
-                "{$user['first_name']} {$user['last_name']}"
-            );
-        } catch (RequestException $exception) {
-            throw new InvalidRequest('Can not get user profile', 0, $exception);
-        }
-    }
-
-    /**
-     * Get message received from sender.
-     *
-     * @return ReceivedMessage
-     */
-    public function getMessage(): ReceivedMessage
-    {
-        return new FacebookReceivedMessage($this->request->getParameter('entry.0.messaging.0.message'));
     }
 
     /**
@@ -103,6 +79,55 @@ class FacebookDriver extends Driver implements WebhookVerification
         throw new InvalidRequest('Invalid verify token');
     }
 
+    /**
+     * Get current chat.
+     *
+     * @return Chat
+     */
+    public function getChat(): Chat
+    {
+        $id = $this->request->getParameter('entry.0.messaging.0.sender.id');
+
+        return new Chat($id, '');
+    }
+
+    /**
+     * Get message sender.
+     * @return User
+     * @throws InvalidRequest
+     */
+    public function getUser(): User
+    {
+        if ($this->sender !== null) {
+            return $this->sender;
+        }
+
+        $id = $this->request->getParameter('entry.0.messaging.0.sender.id');
+
+        try {
+            $response = $this->http->get(self::API_URL.$id, $this->getDefaultRequestParameters());
+            $user = json_decode((string) $response->getBody(), true);
+            $user['id'] = (string) $id;
+
+            return $this->sender = new User(
+                $user['id'],
+                "{$user['first_name']} {$user['last_name']}"
+            );
+        } catch (RequestException $exception) {
+            throw new InvalidRequest('Can not get user profile', 0, $exception);
+        }
+    }
+
+    /**
+     * Get message received from sender.
+     *
+     * @return ReceivedMessage
+     */
+    public function getMessage(): ReceivedMessage
+    {
+        return new FacebookReceivedMessage($this->request->getParameter('entry.0.messaging.0.message'));
+    }
+
     protected function getDefaultRequestParameters(): array
     {
         return [
@@ -126,45 +151,5 @@ class FacebookDriver extends Driver implements WebhookVerification
         if (!hash_equals($header, 'sha1='.hash_hmac('sha1', json_encode($this->request->getParameters()), $secret))) {
             throw new InvalidRequest('Invalid signature header');
         }
-    }
-
-    /**
-     * Handle command.
-     *
-     * @param Command $command
-     *
-     * @throws InvalidConfiguration
-     */
-    public function handle(Command $command): void
-    {
-        if ($command instanceof SendMessage) {
-            $adapter = new SendMessageAdapter($command);
-        } elseif ($command instanceof SendAttachment) {
-            $adapter = new SendAttachmentAdapter($command);
-        } else {
-            throw new InvalidConfiguration('Not resolved command instance.');
-        }
-
-        $this->getGuzzle()->post(
-            self::API_URL.'me/messages',
-            $this->getDefaultRequestParameters() + [$adapter->encodeType() => $adapter->toArray()]
-        );
-    }
-
-    protected function getGuzzle(): Client
-    {
-        return $this->guzzle ?: new Client();
-    }
-
-    /**
-     * Get current chat.
-     *
-     * @return Chat
-     */
-    public function getChat(): Chat
-    {
-        $id = $this->request->getParameter('entry.0.messaging.0.sender.id');
-
-        return new Chat($id, '');
     }
 }
