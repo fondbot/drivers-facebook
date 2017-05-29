@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace FondBot\Drivers\Facebook;
 
 use FondBot\Drivers\CommandHandler;
+use FondBot\Drivers\Commands\SendAttachment;
 use FondBot\Drivers\Commands\SendMessage;
 use FondBot\Drivers\Commands\SendRequest;
-use FondBot\Drivers\Commands\SendAttachment;
 
 class FacebookCommandHandler extends CommandHandler
 {
@@ -20,7 +20,12 @@ class FacebookCommandHandler extends CommandHandler
     {
         if ($command->getTemplate() === null) {
             $payload = [
-                'text' => $command->getText(),
+                'recipient' => [
+                    'id' => $command->getChat()->getId(),
+                ],
+                'message' => [
+                    'text' => $command->getText(),
+                ],
             ];
         } else {
             $payload = $this->driver
@@ -34,7 +39,7 @@ class FacebookCommandHandler extends CommandHandler
                 'query' => [
                     'access_token' => $this->driver->getParameter('page_token'),
                 ],
-                'json' => json_encode($payload),
+                'json' => $payload,
             ]
         );
     }
