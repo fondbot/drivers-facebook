@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace FondBot\Drivers\Facebook\Templates;
 
-use FondBot\Contracts\Template;
 use FondBot\Contracts\Arrayable;
-use FondBot\Templates\Keyboard\Button;
+use FondBot\Contracts\Template;
 use FondBot\Drivers\Facebook\Templates\ListTemplate\Element;
+use FondBot\Templates\Keyboard\Button;
 
 class ListTemplate implements Template, Arrayable
 {
@@ -92,7 +92,7 @@ class ListTemplate implements Template, Arrayable
             'attachment' => [
                 'type' => 'template',
                 'payload' => [
-                    'template_list' => 'list',
+                    'template_type' => 'list',
                     'sharable' => $this->sharable,
                     'top_element_style' => $this->topElementStyle,
                     'elements' => $this->elements,

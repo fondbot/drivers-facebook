@@ -20,12 +20,7 @@ class FacebookCommandHandler extends CommandHandler
     {
         if ($command->getTemplate() === null) {
             $payload = [
-                'recipient' => [
-                    'id' => $command->getChat()->getId(),
-                ],
-                'message' => [
-                    'text' => $command->getText(),
-                ],
+                'text' => $command->getText(),
             ];
         } else {
             $payload = $this->driver
@@ -39,7 +34,12 @@ class FacebookCommandHandler extends CommandHandler
                 'query' => [
                     'access_token' => $this->driver->getParameter('page_token'),
                 ],
-                'json' => $payload,
+                'json' => [
+                    'recipient' => [
+                        'id' => $command->getChat()->getId(),
+                    ],
+                    'message' => $payload,
+                ],
             ]
         );
     }
