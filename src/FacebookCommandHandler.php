@@ -75,7 +75,7 @@ class FacebookCommandHandler extends CommandHandler
                     ],
                     [
                         'name' => 'filedata',
-                        'filename' => $command->getAttachment()->getPath(),
+                        'contents' => fopen($command->getAttachment()->getPath(), 'rb'),
                     ],
                 ],
             ]
