@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace FondBot\Drivers\Facebook;
 
 use FondBot\Drivers\CommandHandler;
-use FondBot\Drivers\Commands\SendAttachment;
 use FondBot\Drivers\Commands\SendMessage;
 use FondBot\Drivers\Commands\SendRequest;
+use FondBot\Drivers\Commands\SendAttachment;
 
 class FacebookCommandHandler extends CommandHandler
 {

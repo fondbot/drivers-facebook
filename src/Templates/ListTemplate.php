@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace FondBot\Drivers\Facebook\Templates;
 
-use FondBot\Contracts\Arrayable;
 use FondBot\Contracts\Template;
-use FondBot\Drivers\Facebook\Templates\ListTemplate\Element;
+use FondBot\Contracts\Arrayable;
 use FondBot\Templates\Keyboard\Button;
+use FondBot\Drivers\Facebook\Templates\ListTemplate\Element;
 
 class ListTemplate implements Template, Arrayable
 {
@@ -47,10 +47,14 @@ class ListTemplate implements Template, Arrayable
      * Set top element style.
      *
      * @param string $topElementStyle
+     *
+     * @return ListTemplate
      */
-    public function setTopElementStyle(string $topElementStyle)
+    public function setTopElementStyle(string $topElementStyle): ListTemplate
     {
         $this->topElementStyle = $topElementStyle;
+
+        return $this;
     }
 
     /**
