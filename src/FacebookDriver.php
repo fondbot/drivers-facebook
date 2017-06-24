@@ -5,14 +5,14 @@ declare(strict_types=1);
 namespace FondBot\Drivers\Facebook;
 
 use FondBot\Drivers\Chat;
-use FondBot\Drivers\User;
-use FondBot\Drivers\Driver;
 use FondBot\Drivers\CommandHandler;
-use FondBot\Drivers\ReceivedMessage;
-use FondBot\Drivers\TemplateCompiler;
-use GuzzleHttp\Exception\RequestException;
+use FondBot\Drivers\Driver;
 use FondBot\Drivers\Exceptions\InvalidRequest;
 use FondBot\Drivers\Extensions\WebhookVerification;
+use FondBot\Drivers\ReceivedMessage;
+use FondBot\Drivers\TemplateCompiler;
+use FondBot\Drivers\User;
+use GuzzleHttp\Exception\RequestException;
 
 class FacebookDriver extends Driver implements WebhookVerification
 {
@@ -98,7 +98,7 @@ class FacebookDriver extends Driver implements WebhookVerification
      */
     public function getUser(): User
     {
-        if ($this->sender !== null) {
+        if ($this->sender instanceof User) {
             return $this->sender;
         }
 
@@ -107,11 +107,10 @@ class FacebookDriver extends Driver implements WebhookVerification
         try {
             $response = $this->http->get(self::API_URL.$id, $this->getDefaultRequestParameters());
             $user = json_decode((string) $response->getBody(), true);
-            $user['id'] = (string) $id;
 
             return $this->sender = new User(
-                $user['id'],
-                "{$user['first_name']} {$user['last_name']}"
+                (string) $id,
+                $this->resolveUserName($user)
             );
         } catch (RequestException $exception) {
             throw new InvalidRequest('Can not get user profile', 0, $exception);
@@ -151,5 +150,16 @@ class FacebookDriver extends Driver implements WebhookVerification
         if (!hash_equals($header, 'sha1='.hash_hmac('sha1', json_encode($this->request->getParameters()), $secret))) {
             throw new InvalidRequest('Invalid signature header');
         }
+    }
+
+    protected function resolveUserName(array $user = []): string
+    {
+        if (array_key_exists('name', $user)) {
+            return trim($user['name']);
+        }
+
+        $name = [$user['first_name'] ?? null, $user['last_name'] ?? null];
+
+        return trim(implode(" ", $name));
     }
 }
