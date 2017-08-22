@@ -5,4 +5,4 @@ This is an official Facebook Messenger driver for [FondBot](https://github.com/f
 
 ## Installation And Usage
 
-Read official Facebook Driver usage [documentation](http://docs.fondbot.com/#/drivers/facebook).
+Read official Facebook Driver usage [documentation](https://fondbot.io/docs/en/master/drivers/facebook).
